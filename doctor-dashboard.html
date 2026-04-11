@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard | MedisyncPRO</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .logo-gradient {
+            background: linear-gradient(90deg, #06b6d4 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .active-nav {
+            background-color: #14b8a6;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(20, 184, 166, 0.3), 0 4px 6px -2px rgba(20, 184, 166, 0.1);
+        }
+
+        .inactive-nav {
+            color: #64748b;
+        }
+
+        .inactive-nav:hover {
+            background-color: #f8fafc;
+            color: #0d9488;
+        }
+
+        /* Verification Modal */
+        .verify-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .verify-modal {
+            background: white;
+            border-radius: 2rem;
+            padding: 2.5rem;
+            max-width: 520px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verify-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #06b6d4, #10b981, #8b5cf6);
+        }
+
+        .verify-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.875rem;
+            font-size: 0.875rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        .verify-input:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+            background: white;
+        }
+
+        .verify-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 0.875rem;
+            font-size: 0.875rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.2s;
+            background: #f8fafc;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        .verify-select:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+            background-color: white;
+        }
+
+        .verify-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .verify-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.025em;
+        }
+
+        .verify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(20, 184, 166, 0.4);
+        }
+
+        .verify-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .pending-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .pending-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 3rem;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.9);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        .pulse-icon {
+            position: relative;
+        }
+
+        .pulse-icon::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            background: rgba(251, 191, 36, 0.3);
+            animation: pulse-ring 1.5s ease infinite;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden text-slate-800">
+
+    <!-- DOCTOR VERIFICATION MODAL -->
+    <div id="verify-modal-overlay" class="verify-overlay" style="display:none;">
+        <div class="verify-modal">
+            <div class="flex items-center gap-3 mb-2">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-xl flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-user-doctor text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-800">Doctor Verification</h2>
+                    <p class="text-xs text-slate-400 font-medium">Verify your medical license to access the dashboard
+                    </p>
+                </div>
+            </div>
+
+            <div class="w-full h-px bg-slate-100 my-5"></div>
+
+            <form id="verify-form" class="space-y-4">
+                <div>
+                    <label class="verify-label">Doctor Name</label>
+                    <input type="text" id="v-doctor-name" class="verify-input"
+                        placeholder="Enter your full name as per medical registration" required>
+                </div>
+
+                <div>
+                    <label class="verify-label">Registration Number</label>
+                    <input type="text" id="v-reg-number" class="verify-input"
+                        placeholder="Enter your medical registration number" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="verify-label">Year of Registration</label>
+                        <select id="v-reg-year" class="verify-select" required>
+                            <option value="" disabled selected>Choose Year</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="verify-label">State Medical Council</label>
+                        <select id="v-state-council" class="verify-select" required>
+                            <option value="" disabled selected>Select Council</option>
+                            <option value="Andhra Pradesh Medical Council">Andhra Pradesh Medical Council</option>
+                            <option value="Arunachal Pradesh Medical Council">Arunachal Pradesh Medical Council</option>
+                            <option value="Assam Medical Council">Assam Medical Council</option>
+                            <option value="Bihar Medical Council">Bihar Medical Council</option>
+                            <option value="Chattisgarh Medical Council">Chattisgarh Medical Council</option>
+                            <option value="Delhi Medical Council">Delhi Medical Council</option>
+                            <option value="Goa Medical Council">Goa Medical Council</option>
+                            <option value="Gujarat Medical Council">Gujarat Medical Council</option>
+                            <option value="Haryana Medical Council">Haryana Medical Council</option>
+                            <option value="Himachal Pradesh Medical Council">Himachal Pradesh Medical Council</option>
+                            <option value="Jammu & Kashmir Medical Council">Jammu & Kashmir Medical Council</option>
+                            <option value="Jharkhand Medical Council">Jharkhand Medical Council</option>
+                            <option value="Karnataka Medical Council">Karnataka Medical Council</option>
+                            <option value="Kerala Medical Council">Kerala Medical Council</option>
+                            <option value="Madhya Pradesh Medical Council">Madhya Pradesh Medical Council</option>
+                            <option value="Maharashtra Medical Council">Maharashtra Medical Council</option>
+                            <option value="Manipur Medical Council">Manipur Medical Council</option>
+                            <option value="Meghalaya Medical Council">Meghalaya Medical Council</option>
+                            <option value="Mizoram Medical Council">Mizoram Medical Council</option>
+                            <option value="Nagaland Medical Council">Nagaland Medical Council</option>
+                            <option value="Odisha Medical Council">Odisha Council of Medical Registration</option>
+                            <option value="Punjab Medical Council">Punjab Medical Council</option>
+                            <option value="Rajasthan Medical Council">Rajasthan Medical Council</option>
+                            <option value="Sikkim Medical Council">Sikkim Medical Council</option>
+                            <option value="Tamil Nadu Medical Council">Tamil Nadu Medical Council</option>
+                            <option value="Telangana Medical Council">Telangana State Medical Council</option>
+                            <option value="Tripura Medical Council">Tripura Medical Council</option>
+                            <option value="Uttarakhand Medical Council">Uttarakhand Medical Council</option>
+                            <option value="Uttar Pradesh Medical Council">Uttar Pradesh Medical Council</option>
+                            <option value="West Bengal Medical Council">West Bengal Medical Council</option>
+                            <option value="Medical Council of India">Medical Council of India (NMC)</option>
+                            <option value="Travancore Cochin Medical Council">Travancore Cochin Medical Council</option>
+                            <option value="Vidarbha Medical Council">Vidarbha Medical Council</option>
+                            <option value="Hyderabad Medical Council">Hyderabad Medical Council</option>
+                            <option value="Mysore Medical Council">Mysore Medical Council</option>
+                            <option value="Bombay Medical Council">Bombay Medical Council</option>
+                            <option value="Madhya Bharat Medical Council">Madhya Bharat Medical Council</option>
+                            <option value="Saurashtra Medical Council">Saurashtra Medical Council</option>
+                            <option value="Vindhya Pradesh Medical Council">Vindhya Pradesh Medical Council</option>
+                            <option value="Bhopal Medical Council">Bhopal Medical Council</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2.5 mt-2">
+                    <i class="fa-solid fa-shield-halved text-amber-500 text-sm mt-0.5"></i>
+                    <p class="text-xs text-amber-700 leading-relaxed">Your details will be reviewed by the MedisyncPRO
+                        admin team. You'll get access once verification is approved.</p>
+                </div>
+
+                <button type="submit" id="verify-submit-btn" class="verify-btn mt-2">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> Submit for Verification
+                </button>
+            </form>
+
+            <div id="verify-error" class="hidden mt-3 text-sm text-rose-500 font-semibold text-center"></div>
+        </div>
+    </div>
+
+    <!-- PENDING VERIFICATION OVERLAY -->
+    <div id="pending-overlay" class="pending-overlay" style="display:none;">
+        <div class="pending-card">
+            <div class="flex justify-center mb-6">
+                <div class="pulse-icon w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center relative">
+                    <i class="fa-solid fa-clock text-amber-500 text-3xl"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-800 mb-2">Verification Pending</h2>
+            <p class="text-slate-500 text-sm leading-relaxed mb-6">Your doctor verification request has been submitted
+                successfully. Our admin team is reviewing your credentials.</p>
+            <div class="bg-slate-50 rounded-2xl p-4 mb-6 text-left space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Name</span>
+                    <span id="pending-name" class="text-sm font-bold text-slate-700">-</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Reg. No.</span>
+                    <span id="pending-reg" class="text-sm font-bold text-slate-700">-</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</span>
+                    <span class="text-xs font-bold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-full"><i
+                            class="fa-solid fa-hourglass-half mr-1"></i> PENDING</span>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">You will be able to access the dashboard once your verification is
+                approved by the admin.</p>
+            <button onclick="logout()"
+                class="w-full py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-200 transition">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Logout & Check Back Later
+            </button>
+        </div>
+    </div>
+
+    <aside class="w-64 bg-white border-r border-slate-100 flex flex-col justify-between h-full fixed shadow-sm z-10">
+        <div>
+            <!-- LOGO -->
+            <div class="flex items-center gap-3 px-8 py-8">
+                <img src="medisync-logo.png" alt="Logo" class="w-8 h-8 object-contain">
+                <h1 class="text-xl font-extrabold tracking-tight logo-gradient">MediSync<span
+                        class="text-slate-400 font-bold">PRO</span></h1>
+            </div>
+
+            <!-- NAVIGATION -->
+            <nav class="px-4 space-y-2 mt-4">
+                <button id="nav-dashboard" onclick="switchTab('dashboard')"
+                    class="nav-link active-nav w-full flex items-center gap-4 px-6 py-3.5 rounded-2xl font-semibold transition-all">
+                    <i class="fa-solid fa-border-all text-lg w-5"></i>
+                    <span>Dashboard</span>
+                </button>
+
+                <button id="nav-appointments" onclick="switchTab('appointments')"
+                    class="nav-link inactive-nav w-full flex items-center gap-4 px-6 py-3.5 rounded-2xl font-medium transition-all group">
+                    <i class="fa-regular fa-calendar-check text-lg w-5 group-hover:scale-110 transition-transform"></i>
+                    <span>Appointments</span>
+                </button>
+
+                <button id="nav-meeting" onclick="switchTab('meeting')"
+                    class="nav-link inactive-nav w-full flex items-center gap-4 px-6 py-3.5 rounded-2xl font-medium transition-all group">
+                    <i class="fa-solid fa-video text-lg w-5 group-hover:scale-110 transition-transform"></i>
+                    <span>Meeting Room</span>
+                </button>
+
+                <button id="nav-patients" onclick="switchTab('patients')"
+                    class="nav-link inactive-nav w-full flex items-center gap-4 px-6 py-3.5 rounded-2xl font-medium transition-all group">
+                    <i class="fa-solid fa-user-group text-lg w-5 group-hover:scale-110 transition-transform"></i>
+                    <span>Patients</span>
+                </button>
+
+                <button id="nav-profile" onclick="switchTab('profile')"
+                    class="nav-link inactive-nav w-full flex items-center gap-4 px-6 py-3.5 rounded-2xl font-medium transition-all group">
+                    <i class="fa-regular fa-circle-user text-lg w-5 group-hover:scale-110 transition-transform"></i>
+                    <span>Profile</span>
+                </button>
+
+                <button id="nav-settings" onclick="switchTab('settings')"
+                    class="nav-link inactive-nav w-full flex items-center gap-4 px-6 py-3.5 rounded-2xl font-medium transition-all group">
+                    <i class="fa-solid fa-gear text-lg w-5 group-hover:scale-110 transition-transform"></i>
+                    <span>Settings</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- LOGOUT -->
+        <div class="px-4 mb-8">
+            <button onclick="logout()"
+                class="flex items-center gap-4 px-6 py-3.5 rounded-2xl text-rose-500 hover:bg-rose-50 font-medium transition-all w-full text-left">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 ml-64 flex flex-col h-screen overflow-y-auto">
+
+        <!-- HEADER -->
+        <header class="flex items-center justify-between px-10 py-6 bg-slate-50 sticky top-0 z-10 w-full">
+            <!-- SEARCH BAR -->
+            <div class="relative w-96">
+                <i
+                    class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                <input type="text" placeholder="Search appointments..."
+                    class="w-full bg-white text-sm py-3 pl-12 pr-4 rounded-full border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent shadow-sm">
+            </div>
+
+            <!-- PROFILE AREA -->
+            <div class="flex items-center gap-8">
+                <div class="relative" id="doc-notif-wrapper">
+                    <button onclick="toggleDocNotifications()"
+                        class="relative text-slate-400 hover:text-slate-600 transition">
+                        <i class="fa-regular fa-bell text-xl"></i>
+                        <span id="doc-notif-badge"
+                            class="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 rounded-full border-2 border-slate-50 text-[10px] text-white font-bold flex items-center justify-center hidden">0</span>
+                    </button>
+                    <div id="doc-notif-dropdown"
+                        class="hidden absolute top-12 right-0 w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden"
+                        style="animation: fadeSlideIn .25s ease;">
+                        <div
+                            class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-rose-50 to-orange-50">
+                            <h4 class="font-extrabold text-slate-800"><i
+                                    class="fa-solid fa-triangle-exclamation text-rose-500 mr-2"></i>Emergency Alerts
+                            </h4>
+                            <button onclick="clearDocNotifications()"
+                                class="text-xs font-bold text-rose-500 hover:underline">Clear All</button>
+                        </div>
+                        <div id="doc-notif-list" class="max-h-80 overflow-y-auto">
+                            <div class="text-center py-8 text-slate-400">
+                                <p class="text-sm font-medium">No alerts</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="flex items-center gap-4 bg-white px-2 py-1.5 rounded-full border border-slate-100 shadow-sm pr-6 cursor-pointer hover:shadow-md transition">
+                    <img src="doctor-profile.jpg" alt="Dr Profile"
+                        class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
+                    <div class="flex flex-col">
+                        <span id="doctor-name" class="text-sm font-bold text-slate-800">Doctor</span>
+                        <span id="doctor-specialty" class="text-[10px] font-bold text-teal-500 tracking-wider">GENERAL PHYSICIAN</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT CONTAINER -->
+        <div class="p-10 pt-4 w-full h-full relative">
+
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="tab-content block">
+                <!-- STAT CARDS ROW -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- CARD 1 -->
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 card-hover flex flex-col justify-between cursor-pointer"
+                        onclick="switchTab('appointments')">
+                        <div
+                            class="w-10 h-10 mb-4 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
+                            <i class="fa-regular fa-calendar text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Today's
+                                Appointments</p>
+                            <h2 class="text-4xl font-extrabold text-slate-800">4</h2>
+                        </div>
+                    </div>
+                    <!-- CARD 2: TOTAL PATIENTS (Dynamic) -->
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 card-hover flex flex-col justify-between cursor-pointer"
+                        onclick="switchTab('patients')">
+                        <div
+                            class="w-10 h-10 mb-4 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
+                            <i class="fa-solid fa-user-group text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Total Patients</p>
+                            <h2 id="total-patient-count" class="text-4xl font-extrabold text-slate-800">â€”</h2>
+                        </div>
+                    </div>
+                    <!-- CARD 3: EMERGENCY ALERTS -->
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 card-hover flex flex-col justify-between cursor-pointer" onclick="scrollToEmergency()">
+                        <div class="w-10 h-10 mb-4 bg-rose-50 rounded-xl flex items-center justify-center text-rose-400">
+                            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Emergency Alerts</p>
+                            <div class="flex items-baseline gap-3">
+                                <h2 id="emergency-alert-count" class="text-4xl font-extrabold text-rose-500">—</h2>
+                                <span class="text-xs font-bold text-rose-500 bg-rose-50 px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle text-[6px] animate-pulse mr-1"></i>LIVE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN GRID -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- EMERGENCY PATIENTS PANEL -->
+                    <div class="col-span-2 bg-white rounded-3xl shadow-sm border border-slate-100 p-8 flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-2xl font-extrabold text-slate-800 mb-1">Emergency Patients</h3>
+                                <p class="text-sm text-slate-400">Sorted by health criticality</p>
+                            </div>
+                            <span class="text-xs bg-rose-50 text-rose-600 px-3 py-1.5 rounded-xl font-bold"><i
+                                    class="fa-solid fa-circle text-[8px] animate-pulse mr-1"></i> LIVE TRIAGE</span>
+                        </div>
+                        <div id="emergency-patients-list" class="space-y-3 flex-1 max-h-[420px] overflow-y-auto pr-2">
+                            <div class="text-center py-10 text-slate-400">
+                                <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block"></i>
+                                <p class="text-sm font-medium">Loading patient triage...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: DOCTOR PROFILE CARD (Dynamic) -->
+                    <div
+                        class="col-span-1 bg-white rounded-3xl shadow-sm border border-slate-100 p-8 flex flex-col relative h-full">
+                        <div class="flex flex-col flex-1 items-center justify-center pt-4">
+                            <div class="relative mb-6">
+                                <div
+                                    class="w-32 h-32 bg-sky-50 rounded-full flex justify-center overflow-hidden border-4 border-white shadow-xl relative z-10">
+                                    <img id="doc-profile-photo" src="doctor-profile.jpg" alt="Doctor"
+                                        class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 px-3 py-1 mb-3">
+                                <i
+                                    class="fa-solid fa-lock text-yellow-500 text-xs border-2 border-yellow-500 rounded p-[1px]"></i>
+                                <span class="text-[10px] font-bold text-yellow-500 tracking-wider">VERIFIED
+                                    EXPERT</span>
+                            </div>
+                            <h2 id="doc-card-name" class="text-2xl font-extrabold text-slate-800 mb-1 text-center">
+                                Doctor</h2>
+                            <p id="doc-card-specialty" class="text-xs font-bold text-teal-500 tracking-wider mb-6">
+                                GENERAL PHYSICIAN</p>
+                            <div class="w-full mt-auto space-y-0">
+                                <div class="flex justify-between items-center py-3 border-t border-slate-100">
+                                    <span
+                                        class="text-[11px] font-bold text-slate-400 tracking-wider uppercase">FEES</span>
+                                    <span id="doc-card-fees" class="font-bold text-slate-800">â€”</span>
+                                </div>
+                                <div class="flex justify-between items-center py-3 border-t border-slate-100">
+                                    <span
+                                        class="text-[11px] font-bold text-slate-400 tracking-wider uppercase">EXPERIENCE</span>
+                                    <span id="doc-card-exp" class="font-extrabold text-slate-800">â€”</span>
+                                </div>
+                                <div class="flex justify-between items-center py-3 border-t border-slate-100">
+                                    <span
+                                        class="text-[11px] font-bold text-slate-400 tracking-wider uppercase">HOSPITAL</span>
+                                    <span id="doc-card-hospital"
+                                        class="font-bold text-slate-800 text-right text-sm truncate max-w-[140px]">â€”</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DASHBOARD ANALYTICS CHARTS -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+                        <h3 class="text-lg font-extrabold text-slate-800 mb-1">Patient Health Distribution</h3>
+                        <p class="text-xs text-slate-400 mb-4">Overview of patient criticality levels</p>
+                        <div class="h-64 flex items-center justify-center"><canvas id="chart-health-dist"></canvas></div>
+                    </div>
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+                        <h3 class="text-lg font-extrabold text-slate-800 mb-1">Disease Prevalence</h3>
+                        <p class="text-xs text-slate-400 mb-4">Most common conditions across patients</p>
+                        <div class="h-64"><canvas id="chart-disease-prev"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- VIEW: APPOINTMENTS -->
+            <div id="view-appointments" class="tab-content hidden h-full overflow-y-auto pr-2">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-extrabold text-slate-800">Today's Appointments</h2>
+                    <span class="bg-teal-100 text-teal-700 px-4 py-1.5 rounded-full font-bold text-sm">4 Total</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
+                    <!-- Appt 1 -->
+                    <div
+                        class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between card-hover">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex flex-col items-center justify-center font-bold">
+                                <span class="text-sm">10:00</span>
+                                <span class="text-[10px]">AM</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-lg">Subodh Das</h4>
+                                <p class="text-sm text-slate-500">General Checkup</p>
+                            </div>
+                        </div>
+                        <button
+                            class="px-4 py-2 bg-slate-50 hover:bg-teal-50 text-teal-600 rounded-xl font-bold transition">Start</button>
+                    </div>
+                    <!-- Appt 2 -->
+                    <div
+                        class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between card-hover">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex flex-col items-center justify-center font-bold">
+                                <span class="text-sm">11:30</span>
+                                <span class="text-[10px]">AM</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-lg">Arjun Kumar</h4>
+                                <p class="text-sm text-slate-500">Follow-up</p>
+                            </div>
+                        </div>
+                        <button
+                            class="px-4 py-2 bg-slate-50 hover:bg-teal-50 text-teal-600 rounded-xl font-bold transition">Start</button>
+                    </div>
+                    <!-- Appt 3 -->
+                    <div
+                        class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between card-hover bg-slate-50 opacity-70">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-14 h-14 bg-slate-200 text-slate-500 rounded-2xl flex flex-col items-center justify-center font-bold">
+                                <span class="text-sm">02:30</span>
+                                <span class="text-[10px]">PM</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-lg">Apoorva Singh</h4>
+                                <p class="text-sm text-slate-500">Blood Reports</p>
+                            </div>
+                        </div>
+                        <span class="px-4 py-2 text-slate-400 font-bold transition">Completed</span>
+                    </div>
+                    <!-- Appt 4 -->
+                    <div
+                        class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between card-hover">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex flex-col items-center justify-center font-bold">
+                                <span class="text-sm">04:00</span>
+                                <span class="text-[10px]">PM</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-lg">Vikram Sethi</h4>
+                                <p class="text-sm text-slate-500">Consultation</p>
+                            </div>
+                        </div>
+                        <button
+                            class="px-4 py-2 bg-slate-50 hover:bg-teal-50 text-teal-600 rounded-xl font-bold transition">Start</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: MEETING ROOM -->
+            <div id="view-meeting" class="tab-content hidden h-full">
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-6">Meeting Room</h2>
+                <div
+                    class="bg-white rounded-3xl shadow-sm border border-slate-100 p-12 text-center text-slate-400 h-full flex flex-col items-center justify-center">
+                    <i class="fa-solid fa-video text-6xl mb-6 text-slate-300"></i>
+                    <h3 class="text-2xl font-bold text-slate-700 mb-2">Virtual Care</h3>
+                    <p class="max-w-md">Start a new video consultation with your patients here. Your meeting link is
+                        currently inactive.</p>
+                    <button
+                        class="mt-8 px-6 py-3 bg-[#14b8a6] text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition"><i
+                            class="fa-solid fa-plus mr-2"></i> Start New Meeting</button>
+                </div>
+            </div>
+
+            <!-- VIEW: PATIENTS (Dynamic from API) -->
+            <div id="view-patients" class="tab-content hidden h-full overflow-y-auto pb-20">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-extrabold text-slate-800">Patient Directory</h2>
+                    <span id="patient-dir-count"
+                        class="bg-teal-100 text-teal-700 px-4 py-1.5 rounded-full font-bold text-sm">â€” Patients</span>
+                </div>
+                <div id="patient-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Patients loaded dynamically from API -->
+                    <div class="col-span-full text-center py-16 text-slate-400">
+                        <i class="fa-solid fa-spinner fa-spin text-3xl mb-4 block"></i>
+                        <p class="font-medium">Loading patients...</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- VIEW: DOCTOR PROFILE -->
+            <div id="view-profile" class="tab-content hidden h-full overflow-y-auto pb-20">
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-6">My Profile</h2>
+                <div class="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 max-w-3xl">
+                    <div class="flex items-center gap-8 mb-8 pb-8 border-b border-slate-100">
+                        <div
+                            class="w-24 h-24 bg-teal-50 rounded-full flex items-center justify-center overflow-hidden border-4 border-white shadow-md flex-shrink-0">
+                            <img id="profile-page-photo" src="doctor-profile.jpg"
+                                class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <h3 id="profile-page-name" class="font-bold text-xl text-slate-800 mb-1">Doctor</h3>
+                            <p class="text-sm text-slate-500">Update your professional details.</p>
+                        </div>
+                    </div>
+
+                    <form id="doctor-profile-form" class="space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Full Name</label>
+                                <input id="doc-profile-name" type="text"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-teal-400">
+                            </div>
+                            <div>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Email</label>
+                                <input id="doc-profile-email" type="email" readonly
+                                    class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-500 cursor-not-allowed">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Phone Number</label>
+                                <div class="flex">
+                                    <span
+                                        class="bg-slate-200 border border-r-0 border-slate-200 rounded-l-xl px-4 py-3 font-bold text-slate-600 text-sm flex items-center flex-shrink-0">+91</span>
+                                    <input id="doc-profile-phone" type="tel" placeholder="10 digit number"
+                                        inputmode="numeric" pattern="[0-9]{10}" maxlength="10"
+                                        oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-r-xl px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Gender</label>
+                                <select id="doc-profile-gender" onchange="updateDocProfilePhoto()"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Specialty</label>
+                                <input id="doc-profile-specialty" type="text"
+                                    placeholder="e.g. General Physician, Cardiologist"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-teal-400">
+                            </div>
+                            <div>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Experience</label>
+                                <input id="doc-profile-exp" type="text" placeholder="e.g. 10+ years"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-teal-400">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Hospital / Clinic</label>
+                                <input id="doc-profile-hospital" type="text"
+                                    placeholder="e.g. Medisync Central Hospital"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-teal-400">
+                            </div>
+                            <div>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Consultation Fees (₹)</label>
+                                <input id="doc-profile-fees" type="number" placeholder="e.g. 500"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-teal-400">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-bold text-slate-600 mb-2 block">About / Bio</label>
+                            <textarea id="doc-profile-about"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-teal-400 h-28 resize-none"
+                                placeholder="Tell patients about yourself..."></textarea>
+                        </div>
+                        <div class="pt-4 flex justify-end">
+                            <button type="button" onclick="saveDoctorProfile()"
+                                class="bg-teal-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-teal-600 transition flex items-center gap-2">
+                                <i class="fa-solid fa-check"></i> Save Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- VIEW: SETTINGS -->
+            <div id="view-settings" class="tab-content hidden h-full">
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-6">Settings</h2>
+                <div
+                    class="bg-white rounded-3xl shadow-sm border border-slate-100 p-12 text-center text-slate-400 h-full flex flex-col items-center justify-center">
+                    <i class="fa-solid fa-gear text-6xl mb-6 text-slate-300"></i>
+                    <h3 class="text-2xl font-bold text-slate-700 mb-2">Account Preferences</h3>
+                    <p class="max-w-md">Manage your schedule, consultation fees, and notification settings.</p>
+                </div>
+            </div>
+
+            <!-- VIEW: PATIENT DETAIL (Enhanced with full profile) -->
+            <div id="view-patient-detail" class="tab-content hidden w-full overflow-y-auto pb-20">
+                <button onclick="switchTab('patients')"
+                    class="mb-6 text-teal-600 font-bold text-sm tracking-wide flex items-center gap-2 hover:text-teal-700 transition w-fit">
+                    <i class="fa-solid fa-arrow-left"></i> BACK TO PATIENTS
+                </button>
+
+                <!-- Patient Header Card -->
+                <div
+                    class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 mb-8 flex gap-8 items-center relative overflow-hidden">
+                    <div
+                        class="relative z-10 w-24 h-24 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-full flex justify-center items-center overflow-hidden border-4 border-white shadow-lg">
+                        <span id="patient-detail-avatar" class="text-3xl font-extrabold text-teal-600">?</span>
+                    </div>
+                    <div class="z-10 flex-1">
+                        <h2 id="patient-detail-name" class="text-3xl font-extrabold text-slate-800 mb-1">Patient Name
+                        </h2>
+                        <div id="patient-detail-subtitle"
+                            class="flex items-center gap-3 text-sm text-slate-500 font-medium flex-wrap">
+                        </div>
+                    </div>
+                    <div class="z-10 text-right hidden md:block">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Joined</p>
+                        <p id="patient-detail-joined" class="text-sm font-bold text-slate-600">â€”</p>
+                    </div>
+                    <i
+                        class="fa-solid fa-heart-pulse absolute -bottom-10 -right-10 text-[10rem] text-slate-50 opacity-50 z-0 tracking-tighter"></i>
+                </div>
+
+                <!-- Patient Info Grid -->
+                <h3 class="text-xl font-extrabold text-slate-800 mb-5 flex items-center gap-2"><i
+                        class="fa-solid fa-id-card text-teal-500"></i> Personal Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email</p>
+                        <p id="patient-detail-email" class="text-sm font-bold text-slate-700 break-all">â€”</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Phone</p>
+                        <p id="patient-detail-phone" class="text-sm font-bold text-slate-700">â€”</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Gender</p>
+                        <p id="patient-detail-gender" class="text-sm font-bold text-slate-700">â€”</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Age</p>
+                        <p id="patient-detail-age" class="text-sm font-bold text-slate-700">â€”</p>
+                    </div>
+                </div>
+
+                <!-- Medical Profile -->
+                <h3 class="text-xl font-extrabold text-slate-800 mb-5 flex items-center gap-2"><i
+                        class="fa-solid fa-notes-medical text-rose-500"></i> Medical Profile</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                    <!-- Allergies -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center"><i
+                                    class="fa-solid fa-allergies text-amber-500 text-sm"></i></div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Allergies</p>
+                        </div>
+                        <p id="patient-detail-allergies" class="text-sm font-semibold text-slate-700 leading-relaxed">
+                            â€”</p>
+                    </div>
+                    <!-- Diabetes -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center"><i
+                                    class="fa-solid fa-droplet text-blue-500 text-sm"></i></div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Diabetes</p>
+                        </div>
+                        <div id="patient-detail-diabetes" class="text-sm font-semibold text-slate-700">â€”</div>
+                    </div>
+                    <!-- Disabilities -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center"><i
+                                    class="fa-solid fa-wheelchair text-purple-500 text-sm"></i></div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Disabilities</p>
+                        </div>
+                        <div id="patient-detail-disability" class="text-sm font-semibold text-slate-700">â€”</div>
+                    </div>
+                    <!-- Diseases -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 bg-rose-50 rounded-lg flex items-center justify-center"><i
+                                    class="fa-solid fa-virus text-rose-500 text-sm"></i></div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Known Diseases</p>
+                        </div>
+                        <div id="patient-detail-diseases" class="text-sm font-semibold text-slate-700">â€”</div>
+                    </div>
+                </div>
+
+                <!-- AI Clinical Summary -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-5">
+                        <h3 class="text-xl font-extrabold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles text-cyan-500"></i> AI Clinical Triage</h3>
+                        <button onclick="getDetailAISummary()" id="detail-ai-btn" class="bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-bold py-2.5 px-6 rounded-xl shadow hover:shadow-lg transition flex items-center gap-2 text-sm"><i class="fa-solid fa-wand-magic-sparkles"></i> Get AI Analysis</button>
+                    </div>
+                    <div id="detail-ai-panel" class="hidden bg-gradient-to-br from-cyan-50 to-teal-50 p-6 rounded-2xl border border-cyan-100">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center text-white flex-shrink-0"><i class="fa-solid fa-brain"></i></div>
+                            <div class="flex-1">
+                                <h4 class="font-extrabold text-cyan-800 mb-2">Clinical Assessment</h4>
+                                <div id="detail-ai-text" class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">Analyzing patient data...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Vitals Summary Cards -->
+                <h3 class="text-xl font-extrabold text-slate-800 mb-5 flex items-center gap-2"><i class="fa-solid fa-heart-pulse text-emerald-500"></i> Real-Time Health Metrics</h3>
+                <div id="patient-vitals-summary" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6"></div>
+
+                <!-- Full Vitals Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4"><i class="fa-solid fa-droplet text-rose-500 mr-2"></i>Blood Pressure (6h)</h4>
+                        <div class="h-56"><canvas id="pd-chart-bp"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4"><i class="fa-solid fa-heart-pulse text-rose-500 mr-2"></i>Heart Rate (6h)</h4>
+                        <div class="h-56"><canvas id="pd-chart-hr"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4"><i class="fa-solid fa-lungs text-sky-500 mr-2"></i>SpO2 (6h)</h4>
+                        <div class="h-56"><canvas id="pd-chart-spo2"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4"><i class="fa-solid fa-temperature-half text-amber-500 mr-2"></i>Temperature (6h)</h4>
+                        <div class="h-56"><canvas id="pd-chart-temp"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4"><i class="fa-solid fa-wind text-indigo-500 mr-2"></i>Respiratory Rate (6h)</h4>
+                        <div class="h-56"><canvas id="pd-chart-rr"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4"><i class="fa-solid fa-syringe text-purple-500 mr-2"></i>Blood Glucose (6h)</h4>
+                        <div class="h-56"><canvas id="pd-chart-glucose"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Treating Doctor Info -->
+                <h3 class="text-xl font-extrabold text-slate-800 mb-5 flex items-center gap-2"><i class="fa-solid fa-user-doctor text-teal-500"></i> Treating Doctor</h3>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-8 flex items-center gap-6">
+                    <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg flex-shrink-0">
+                        <img id="detail-doc-photo" src="doctor-profile.jpg" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 id="detail-doc-name" class="text-lg font-extrabold text-slate-800 mb-0.5">Doctor</h4>
+                        <p id="detail-doc-spec" class="text-sm text-teal-600 font-bold mb-2">General Physician</p>
+                        <div class="flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+                            <span id="detail-doc-exp" class="bg-slate-50 px-3 py-1 rounded-lg"><i class="fa-solid fa-briefcase-medical mr-1 text-slate-400"></i>—</span>
+                            <span id="detail-doc-hospital" class="bg-slate-50 px-3 py-1 rounded-lg"><i class="fa-solid fa-hospital mr-1 text-slate-400"></i>—</span>
+                            <span id="detail-doc-fees" class="bg-slate-50 px-3 py-1 rounded-lg"><i class="fa-solid fa-indian-rupee-sign mr-1 text-slate-400"></i>—</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-xl flex-shrink-0">
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-sm"></i>
+                        <span class="text-[10px] font-bold text-emerald-600 tracking-wider">VERIFIED</span>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End Dashboard Content -->
+
+    </main>
+
+    <script>
+        // Global patient data store
+        let allPatients = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('medisync_token');
+            if (!token) {
+                window.location.href = "doctor-login.html";
+                return;
+            }
+
+            // Populate year dropdown (1947-2026)
+            const yearSelect = document.getElementById('v-reg-year');
+            if (yearSelect) {
+                for (let y = 2026; y >= 1947; y--) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.textContent = y;
+                    yearSelect.appendChild(opt);
+                }
+            }
+
+            try {
+                const response = await fetch('/api/users/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData.role !== "Doctor") {
+                        window.location.href = "login.html";
+                        return;
+                    }
+
+                    const nameEl = document.getElementById("doctor-name");
+                    if (nameEl) nameEl.innerText = userData.name;
+
+                    // Update header specialty dynamically
+                    const headerSpec = document.getElementById('doctor-specialty');
+                    if (headerSpec) headerSpec.textContent = (userData.specialty || 'General Physician').toUpperCase();
+
+                    // Store verification data globally and populate profile card
+                    window._docVerification = userData.doctorVerification;
+                    populateDoctorProfileCard(userData);
+
+                    // Check doctor verification status
+                    const verification = userData.doctorVerification;
+
+                    if (!verification) {
+                        document.getElementById('verify-modal-overlay').style.display = 'flex';
+                    } else if (verification.status === 'pending') {
+                        document.getElementById('pending-name').textContent = verification.doctorName;
+                        document.getElementById('pending-reg').textContent = verification.registrationNumber;
+                        document.getElementById('pending-overlay').style.display = 'flex';
+                    }
+
+                    // Load patients for any doctor who can access the dashboard
+                    if (verification && verification.status !== 'pending') {
+                        await loadPatients(token);
+                    }
+
+                } else {
+                    localStorage.removeItem('medisync_token');
+                    window.location.href = "doctor-login.html";
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+
+            // Handle verification form submission
+            const verifyForm = document.getElementById('verify-form');
+            if (verifyForm) {
+                verifyForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const submitBtn = document.getElementById('verify-submit-btn');
+                    const errorEl = document.getElementById('verify-error');
+                    errorEl.classList.add('hidden');
+
+                    const doctorName = document.getElementById('v-doctor-name').value.trim();
+                    const registrationNumber = document.getElementById('v-reg-number').value.trim();
+                    const yearOfRegistration = document.getElementById('v-reg-year').value;
+                    const stateMedicalCouncil = document.getElementById('v-state-council').value;
+
+                    if (!doctorName || !registrationNumber || !yearOfRegistration || !stateMedicalCouncil) {
+                        errorEl.textContent = 'Please fill in all fields.';
+                        errorEl.classList.remove('hidden');
+                        return;
+                    }
+
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Submitting...';
+
+                    try {
+                        const res = await fetch('/api/doctor/verify', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ doctorName, registrationNumber, yearOfRegistration, stateMedicalCouncil })
+                        });
+
+                        const data = await res.json();
+
+                        if (res.ok) {
+                            document.getElementById('verify-modal-overlay').style.display = 'none';
+                            document.getElementById('pending-name').textContent = doctorName;
+                            document.getElementById('pending-reg').textContent = registrationNumber;
+                            document.getElementById('pending-overlay').style.display = 'flex';
+                        } else {
+                            errorEl.textContent = data.message || 'Submission failed. Please try again.';
+                            errorEl.classList.remove('hidden');
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i> Submit for Verification';
+                        }
+                    } catch (err) {
+                        errorEl.textContent = 'Network error. Please check your connection.';
+                        errorEl.classList.remove('hidden');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i> Submit for Verification';
+                    }
+                });
+            }
+        });
+
+        // ===== LOAD PATIENTS FROM API =====
+        async function loadPatients(token) {
+            try {
+                const res = await fetch('/api/patients', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    allPatients = await res.json();
+                    // Update total patient count on dashboard card
+                    const countEl = document.getElementById('total-patient-count');
+                    if (countEl) countEl.textContent = allPatients.length;
+                    // Update patient directory count badge
+                    const dirCountEl = document.getElementById('patient-dir-count');
+                    if (dirCountEl) dirCountEl.textContent = allPatients.length + ' Patient' + (allPatients.length !== 1 ? 's' : '');
+                    // Render the patient grid
+                    renderPatientGrid();
+                    // Render emergency patients panel on dashboard
+                    renderEmergencyPatients();
+                    // Populate notification bell
+                    populateNotifications();
+                    // Render dashboard analytics charts
+                    renderDashboardAnalytics();
+                }
+            } catch (err) {
+                console.error('Failed to load patients:', err);
+            }
+        }
+
+        // ===== RENDER PATIENT GRID =====
+        function renderPatientGrid() {
+            const grid = document.getElementById('patient-grid');
+            if (!grid) return;
+
+            if (allPatients.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-16 text-slate-400">
+                        <i class="fa-solid fa-user-slash text-5xl mb-4 block text-slate-300"></i>
+                        <p class="font-bold text-slate-500 text-lg mb-1">No Patients Yet</p>
+                        <p class="text-sm">Patients will appear here when they sign up on the platform.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = allPatients.map((p, i) => {
+                const initials = p.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                const colors = ['teal', 'sky', 'indigo', 'purple', 'rose', 'amber'];
+                const color = colors[i % colors.length];
+                const genderIcon = (p.gender || '').toLowerCase() === 'female' ? 'fa-venus' : (p.gender || '').toLowerCase() === 'male' ? 'fa-mars' : 'fa-user';
+                const ageText = p.age ? p.age + ' yrs' : 'â€”';
+                const diseaseCount = (p.diseases || []).length;
+                const joinDate = new Date(p.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                return `
+                    <div onclick="openPatientProfile('${p.id}')"
+                        class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 cursor-pointer card-hover group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-${color}-50 rounded-full -mr-8 -mt-8 opacity-50 group-hover:opacity-100 transition"></div>
+                        <div class="flex items-center gap-4 mb-4 relative z-10">
+                            <div class="w-14 h-14 bg-${color}-50 rounded-2xl flex justify-center items-center flex-shrink-0">
+                                <span class="text-lg font-extrabold text-${color}-600">${initials}</span>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-slate-800 text-lg truncate">${p.name}</h4>
+                                <div class="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                                    <i class="fa-solid ${genderIcon}"></i>
+                                    <span>${ageText}</span>
+                                    <span>â€¢</span>
+                                    <span>${joinDate}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between relative z-10">
+                            <div class="flex items-center gap-2">
+                                ${p.phone ? '<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full"><i class="fa-solid fa-phone text-[8px] mr-1"></i>CONTACT</span>' : ''}
+                                ${diseaseCount > 0 ? '<span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">' + diseaseCount + ' condition' + (diseaseCount > 1 ? 's' : '') + '</span>' : '<span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">Healthy</span>'}
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-teal-500 transition text-sm"></i>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ===== VITALS CONFIG (same as patient dashboard) =====
+        const vitalsConfig = {
+            bp: { label: 'Blood Pressure', unit: 'mmHg', min: 110, max: 130, normalMin: 90, normalMax: 120, color: '#f43f5e', isBP: true },
+            hr: { label: 'Heart Rate', unit: 'BPM', min: 65, max: 82, normalMin: 60, normalMax: 100, color: '#ef4444' },
+            spo2: { label: 'SpO2', unit: '%', min: 95, max: 100, normalMin: 95, normalMax: 100, color: '#0ea5e9' },
+            temp: { label: 'Temperature', unit: '°F', min: 97.5, max: 99.3, normalMin: 97.8, normalMax: 99.1, color: '#f59e0b', decimal: true },
+            rr: { label: 'Respiratory Rate', unit: 'br/min', min: 14, max: 20, normalMin: 12, normalMax: 20, color: '#6366f1' },
+            glucose: { label: 'Blood Glucose', unit: 'mg/dL', min: 80, max: 130, normalMin: 70, normalMax: 140, color: '#a855f7' }
+        };
+        let pdCharts = {};
+        let currentPatientVitals = {};
+        let _currentPatientId = null;
+
+        function generatePatientHistory(cfg, seed) {
+            const data = [];
+            const now = Date.now();
+            let s = seed || 1;
+            for (let i = 72; i >= 0; i--) {
+                const t = new Date(now - i * 5 * 60 * 1000);
+                s = (s * 9301 + 49297) % 233280;
+                const r = s / 233280;
+                const val = cfg.decimal
+                    ? parseFloat((cfg.min + r * (cfg.max - cfg.min)).toFixed(1))
+                    : Math.floor(cfg.min + r * (cfg.max - cfg.min));
+                const entry = { time: t, value: val };
+                if (cfg.isBP) entry.dia = Math.floor(70 + r * 15);
+                data.push(entry);
+            }
+            return data;
+        }
+
+        function getTimeLabels(data) {
+            return data.map(d => {
+                const t = new Date(d.time);
+                return t.getHours().toString().padStart(2, '0') + ':' + t.getMinutes().toString().padStart(2, '0');
+            });
+        }
+
+        function renderPatientVitalsCharts(patientId) {
+            // Destroy old charts
+            Object.values(pdCharts).forEach(c => { if (c) c.destroy(); });
+            pdCharts = {};
+            currentPatientVitals = {};
+
+            // Generate unique data per patient using ID hash as seed
+            let seed = 0;
+            for (let i = 0; i < patientId.length; i++) seed += patientId.charCodeAt(i);
+
+            const colors = ['rose', 'rose', 'sky', 'amber', 'indigo', 'purple'];
+            let ci = 0;
+            const summaryEl = document.getElementById('patient-vitals-summary');
+            let summaryHTML = '';
+
+            for (const [key, cfg] of Object.entries(vitalsConfig)) {
+                const data = generatePatientHistory(cfg, seed + ci * 100);
+                currentPatientVitals[key] = data;
+
+                const vals = data.map(d => d.value);
+                const min = cfg.decimal ? Math.min(...vals).toFixed(1) : Math.min(...vals);
+                const max = cfg.decimal ? Math.max(...vals).toFixed(1) : Math.max(...vals);
+                const avg = cfg.decimal ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1) : Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+
+                summaryHTML += `<div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">${cfg.label}</p><p class="text-lg font-extrabold text-slate-800">${avg}<span class="text-xs text-slate-400 ml-1">${cfg.unit}</span></p><p class="text-[10px] text-slate-500 mt-1">↓${min} ↑${max}</p></div>`;
+
+                // Create chart
+                const ctx = document.getElementById('pd-chart-' + key);
+                if (ctx) {
+                    pdCharts[key] = new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: getTimeLabels(data), datasets: [{ label: cfg.label, data: vals, borderColor: cfg.color, backgroundColor: cfg.color + '15', fill: true, tension: .4, pointRadius: 1, borderWidth: 2.5, pointHoverRadius: 5 }] },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', titleFont: { weight: 'bold' }, bodyFont: { size: 13 }, padding: 10, cornerRadius: 12 } },
+                            scales: {
+                                x: { ticks: { maxTicksLimit: 12, font: { size: 10 }, color: '#94a3b8' }, grid: { display: false } },
+                                y: { ticks: { font: { size: 10 }, color: '#94a3b8' }, grid: { color: '#f1f5f9' }, suggestedMin: cfg.normalMin - (cfg.normalMax - cfg.normalMin) * 0.3, suggestedMax: cfg.normalMax + (cfg.normalMax - cfg.normalMin) * 0.3 }
+                            }
+                        }
+                    });
+                }
+                ci++;
+            }
+            if (summaryEl) summaryEl.innerHTML = summaryHTML;
+
+            // Start real-time vitals update
+            startPatientVitalsLiveUpdate();
+        }
+
+        let _vitalsInterval = null;
+        function startPatientVitalsLiveUpdate() {
+            if (_vitalsInterval) clearInterval(_vitalsInterval);
+            _vitalsInterval = setInterval(() => {
+                if (!_currentPatientId) return;
+                for (const [key, cfg] of Object.entries(vitalsConfig)) {
+                    const data = currentPatientVitals[key];
+                    if (!data || data.length === 0) continue;
+
+                    // Generate a new data point with slight variation from previous
+                    const prev = data[data.length - 1].value;
+                    const range = cfg.max - cfg.min;
+                    const jitter = cfg.decimal
+                        ? parseFloat(((Math.random() - 0.5) * range * 0.15).toFixed(1))
+                        : Math.round((Math.random() - 0.5) * range * 0.15);
+                    let newVal = prev + jitter;
+                    newVal = cfg.decimal
+                        ? parseFloat(Math.max(cfg.min, Math.min(cfg.max, newVal)).toFixed(1))
+                        : Math.floor(Math.max(cfg.min, Math.min(cfg.max, newVal)));
+
+                    const entry = { time: new Date(), value: newVal };
+                    if (cfg.isBP) entry.dia = Math.floor(70 + Math.random() * 15);
+                    data.push(entry);
+                    if (data.length > 73) data.shift();
+
+                    // Update chart
+                    if (pdCharts[key]) {
+                        pdCharts[key].data.labels = getTimeLabels(data);
+                        pdCharts[key].data.datasets[0].data = data.map(d => d.value);
+                        pdCharts[key].update('none');
+                    }
+                }
+
+                // Update summary cards with latest values
+                const summaryEl = document.getElementById('patient-vitals-summary');
+                if (summaryEl) {
+                    let html = '';
+                    for (const [key, cfg] of Object.entries(vitalsConfig)) {
+                        const data = currentPatientVitals[key];
+                        if (!data || data.length === 0) continue;
+                        const latest = data[data.length - 1].value;
+                        const vals = data.map(d => d.value);
+                        const min = cfg.decimal ? Math.min(...vals).toFixed(1) : Math.min(...vals);
+                        const max = cfg.decimal ? Math.max(...vals).toFixed(1) : Math.max(...vals);
+                        const isNormal = latest >= cfg.normalMin && latest <= cfg.normalMax;
+                        const statusColor = isNormal ? 'emerald' : 'rose';
+                        const latestDisplay = cfg.isBP ? latest + '/' + data[data.length - 1].dia : latest;
+                        html += `<div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">${cfg.label}</p>
+                            <p class="text-lg font-extrabold text-slate-800">${latestDisplay}<span class="text-xs text-slate-400 ml-1">${cfg.unit}</span></p>
+                            <div class="flex items-center gap-2 mt-1"><span class="w-2 h-2 rounded-full bg-${statusColor}-500 inline-block"></span><span class="text-[10px] font-bold text-${statusColor}-600">${isNormal ? 'Normal' : 'Alert'}</span><span class="text-[10px] text-slate-400">↓${min} ↑${max}</span></div>
+                        </div>`;
+                    }
+                    summaryEl.innerHTML = html;
+                }
+            }, 3000);
+        }
+
+        function populateDetailDoctorCard() {
+            const docName = document.getElementById('doc-profile-name') ? document.getElementById('doc-profile-name').value : (window._docVerification && window._docVerification.doctorName) || 'Doctor';
+            const docGender = document.getElementById('doc-profile-gender') ? document.getElementById('doc-profile-gender').value : '';
+            const photo = getDocPhotoUrl(docGender);
+            document.getElementById('detail-doc-photo').src = photo;
+            document.getElementById('detail-doc-name').textContent = docName;
+            const specEl = document.getElementById('doc-profile-specialty');
+            document.getElementById('detail-doc-spec').textContent = (specEl ? specEl.value : '') || 'General Physician';
+            const expEl = document.getElementById('doc-profile-exp');
+            document.getElementById('detail-doc-exp').innerHTML = '<i class="fa-solid fa-briefcase-medical mr-1 text-slate-400"></i>' + ((expEl ? expEl.value : '') || '—');
+            const hospEl = document.getElementById('doc-profile-hospital');
+            document.getElementById('detail-doc-hospital').innerHTML = '<i class="fa-solid fa-hospital mr-1 text-slate-400"></i>' + ((hospEl ? hospEl.value : '') || '—');
+            const feesEl = document.getElementById('doc-profile-fees');
+            document.getElementById('detail-doc-fees').innerHTML = '<i class="fa-solid fa-indian-rupee-sign mr-1 text-slate-400"></i>' + ((feesEl ? feesEl.value : '') ? '₹' + feesEl.value : '—');
+        }
+
+        // ===== AI CLINICAL SUMMARY FOR PATIENT DETAIL =====
+        window.getDetailAISummary = async function () {
+            const patient = allPatients.find(p => p.id === _currentPatientId);
+            if (!patient) return;
+
+            const panel = document.getElementById('detail-ai-panel');
+            const textEl = document.getElementById('detail-ai-text');
+            const btn = document.getElementById('detail-ai-btn');
+            panel.classList.remove('hidden');
+            textEl.textContent = 'Analyzing patient data...';
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Analyzing...';
+
+            const conditions = [...(patient.diseases || [])];
+            if (patient.diabetes && patient.diabetes.hasDiabetes) conditions.push('Diabetes ' + (patient.diabetes.type || ''));
+            if (patient.disability && patient.disability.length > 0) conditions.push('Disabilities: ' + patient.disability.join(', '));
+
+            // Include vitals summary
+            const vitalsSummary = Object.entries(vitalsConfig).map(([key, cfg]) => {
+                const vals = (currentPatientVitals[key] || []).map(d => d.value);
+                if (vals.length === 0) return '';
+                const avg = cfg.decimal ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1) : Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+                return `${cfg.label}: Avg=${avg}${cfg.unit}`;
+            }).filter(Boolean).join('; ');
+
+            const prompt = `You are a senior clinical doctor. Provide a detailed clinical triage assessment for this patient:\nName: ${patient.name}\nAge: ${patient.age || 'Unknown'}\nGender: ${patient.gender || 'Unknown'}\nConditions: ${conditions.length > 0 ? conditions.join(', ') : 'None reported'}\nAllergies: ${patient.allergies || 'None'}\nVitals (6h avg): ${vitalsSummary}\n\nProvide:\n1. Overall severity rating (Critical/Moderate/Stable)\n2. Key risk factors\n3. 3-4 specific clinical recommendations\n4. Monitoring priorities\nKeep under 200 words. Use plain text, no markdown.`;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: prompt, role: 'Doctor' })
+                });
+                const data = await res.json();
+                textEl.textContent = data.reply || 'Unable to generate assessment.';
+            } catch (e) {
+                textEl.textContent = 'Failed to connect to AI service. Please check your connection.';
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Get AI Analysis';
+        }
+
+        // ===== OPEN PATIENT PROFILE (by ID) =====
+        window.openPatientProfile = function (patientId) {
+            const patient = allPatients.find(p => p.id === patientId);
+            if (!patient) {
+                document.getElementById('patient-detail-name').innerText = patientId;
+                switchTab('patient-detail');
+                return;
+            }
+            _currentPatientId = patientId;
+
+            // Hide AI panel from previous patient
+            document.getElementById('detail-ai-panel').classList.add('hidden');
+
+            // Avatar initials
+            const initials = patient.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            document.getElementById('patient-detail-avatar').textContent = initials;
+            document.getElementById('patient-detail-name').textContent = patient.name;
+
+            // Subtitle line
+            const subtitleEl = document.getElementById('patient-detail-subtitle');
+            const genderIcon = (patient.gender || '').toLowerCase() === 'female' ? 'fa-venus' : 'fa-mars';
+            let subtitleParts = [];
+            if (patient.gender) subtitleParts.push(`<i class="fa-solid ${genderIcon}"></i> ${patient.gender}`);
+            if (patient.age) subtitleParts.push(`${patient.age} Years Old`);
+            if (patient.email) subtitleParts.push(`<i class="fa-solid fa-envelope text-xs"></i> ${patient.email}`);
+            subtitleEl.innerHTML = subtitleParts.join(' <span class="text-slate-300">•</span> ');
+
+            // Joined date
+            document.getElementById('patient-detail-joined').textContent = new Date(patient.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            // Personal info
+            document.getElementById('patient-detail-email').textContent = patient.email || '—';
+            document.getElementById('patient-detail-phone').textContent = patient.phone || 'Not provided';
+            document.getElementById('patient-detail-gender').textContent = patient.gender || 'Not specified';
+            document.getElementById('patient-detail-age').textContent = patient.age ? patient.age + ' years' : 'Not specified';
+
+            // Allergies
+            document.getElementById('patient-detail-allergies').textContent = patient.allergies || 'No known allergies';
+
+            // Diabetes
+            const diabetesEl = document.getElementById('patient-detail-diabetes');
+            if (patient.diabetes && patient.diabetes.hasDiabetes) {
+                diabetesEl.innerHTML = `
+                    <span class="inline-block bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg text-xs font-bold mr-2">${patient.diabetes.type}</span>
+                    <span class="text-slate-500">Sugar Level: <strong class="text-slate-800">${patient.diabetes.sugarLevel} mg/dL</strong></span>
+                `;
+            } else {
+                diabetesEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> No diabetes</span>';
+            }
+
+            // Disabilities
+            const disabilityEl = document.getElementById('patient-detail-disability');
+            if (patient.disability && patient.disability.length > 0) {
+                disabilityEl.innerHTML = patient.disability.map(d => `<span class="inline-block bg-purple-50 text-purple-700 px-2.5 py-1 rounded-lg text-xs font-bold mr-2 mb-1">${d}</span>`).join('');
+            } else {
+                disabilityEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> None reported</span>';
+            }
+
+            // Diseases
+            const diseasesEl = document.getElementById('patient-detail-diseases');
+            if (patient.diseases && patient.diseases.length > 0) {
+                diseasesEl.innerHTML = patient.diseases.map(d => `<span class="inline-block bg-rose-50 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold mr-2 mb-1">${d}</span>`).join('');
+            } else {
+                diseasesEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> No known conditions</span>';
+            }
+
+            switchTab('patient-detail');
+
+            // Render vitals charts after DOM is visible
+            setTimeout(() => {
+                renderPatientVitalsCharts(patientId);
+                populateDetailDoctorCard();
+            }, 150);
+        }
+
+        window.logout = function () {
+            localStorage.removeItem('medisync_token');
+            window.location.href = "index.html";
+        }
+
+        // Tab system
+        window.switchTab = function (tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            const targetView = document.getElementById('view-' + tabId) || document.getElementById('view-dashboard');
+            targetView.classList.remove('hidden');
+            targetView.classList.add('block');
+
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('active-nav');
+                el.classList.add('inactive-nav');
+            });
+
+            const targetNav = document.getElementById('nav-' + tabId);
+            if (targetNav) {
+                targetNav.classList.remove('inactive-nav');
+                targetNav.classList.add('active-nav');
+            }
+
+            if (tabId === 'patient-detail') {
+                const pNav = document.getElementById('nav-patients');
+                if (pNav) { pNav.classList.remove('inactive-nav'); pNav.classList.add('active-nav'); }
+            }
+        }
+
+        // ===== SCROLL TO EMERGENCY =====
+        window.scrollToEmergency = function () {
+            const el = document.getElementById('emergency-patients-list');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ===== DASHBOARD ANALYTICS CHARTS =====
+        let dashHealthChart = null;
+        let dashDiseaseChart = null;
+
+        function renderDashboardAnalytics() {
+            if (allPatients.length === 0) return;
+
+            // 1. Patient Health Distribution (Doughnut)
+            let critical = 0, moderate = 0, stable = 0;
+            allPatients.forEach(p => {
+                const score = getPatientCriticalityScore(p);
+                if (score >= 7) critical++;
+                else if (score >= 3) moderate++;
+                else stable++;
+            });
+
+            const healthCtx = document.getElementById('chart-health-dist');
+            if (healthCtx) {
+                if (dashHealthChart) dashHealthChart.destroy();
+                dashHealthChart = new Chart(healthCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Critical', 'Moderate', 'Stable'],
+                        datasets: [{ data: [critical, moderate, stable], backgroundColor: ['#f43f5e', '#f59e0b', '#10b981'], borderWidth: 0, borderRadius: 6 }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { size: 12, weight: 'bold' }, color: '#64748b', padding: 20, usePointStyle: true, pointStyleWidth: 12 } }
+                        }
+                    }
+                });
+            }
+
+            // Update emergency alert count
+            const alertCount = document.getElementById('emergency-alert-count');
+            if (alertCount) alertCount.textContent = critical;
+
+            // 2. Disease Prevalence (Bar chart)
+            const diseaseMap = {};
+            allPatients.forEach(p => {
+                (p.diseases || []).forEach(d => { diseaseMap[d] = (diseaseMap[d] || 0) + 1; });
+                if (p.diabetes && p.diabetes.hasDiabetes) { diseaseMap['Diabetes'] = (diseaseMap['Diabetes'] || 0) + 1; }
+            });
+            const diseaseLabels = Object.keys(diseaseMap).sort((a, b) => diseaseMap[b] - diseaseMap[a]).slice(0, 8);
+            const diseaseValues = diseaseLabels.map(l => diseaseMap[l]);
+
+            const diseaseCtx = document.getElementById('chart-disease-prev');
+            if (diseaseCtx && diseaseLabels.length > 0) {
+                if (dashDiseaseChart) dashDiseaseChart.destroy();
+                dashDiseaseChart = new Chart(diseaseCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: diseaseLabels,
+                        datasets: [{ label: 'Patients', data: diseaseValues, backgroundColor: ['#f43f5e', '#f59e0b', '#0ea5e9', '#6366f1', '#a855f7', '#10b981', '#ec4899', '#14b8a6'], borderRadius: 8, borderSkipped: false }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' }, grid: { display: false } },
+                            y: { ticks: { stepSize: 1, font: { size: 10 }, color: '#94a3b8' }, grid: { color: '#f1f5f9' }, beginAtZero: true }
+                        }
+                    }
+                });
+            }
+        }
+
+        function getPatientCriticalityScore(p) {
+            let score = 0;
+            score += (p.diseases || []).length * 3;
+            if (p.diabetes && p.diabetes.hasDiabetes) score += 4;
+            if (p.disability && p.disability.length > 0) score += p.disability.length * 2;
+            if ((p.allergies || '').length > 30) score += 1;
+            return score;
+        }
+
+        function renderEmergencyPatients() {
+            const container = document.getElementById('emergency-patients-list');
+            if (!container || allPatients.length === 0) {
+                if (container) container.innerHTML = '<div class="text-center py-10 text-slate-400"><i class="fa-solid fa-heart-pulse text-3xl mb-3 block text-slate-300"></i><p class="text-sm font-bold text-slate-500">No patients registered yet</p></div>';
+                return;
+            }
+
+            const sorted = [...allPatients].map(p => ({ ...p, score: getPatientCriticalityScore(p) })).sort((a, b) => b.score - a.score);
+
+            container.innerHTML = sorted.map(p => {
+                const severity = p.score >= 7 ? 'Critical' : p.score >= 3 ? 'Moderate' : 'Stable';
+                const sevColor = severity === 'Critical' ? 'rose' : severity === 'Moderate' ? 'amber' : 'emerald';
+                const initials = p.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                const conditions = [...(p.diseases || [])];
+                if (p.diabetes && p.diabetes.hasDiabetes) conditions.push('Diabetes ' + (p.diabetes.type || ''));
+                const condText = conditions.length > 0 ? conditions.slice(0, 3).join(', ') : 'No conditions';
+
+                return `
+                    <div onclick="openPatientProfile('${p.id}')" class="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition cursor-pointer group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-${sevColor}-50 text-${sevColor}-600 rounded-2xl flex items-center justify-center font-bold text-sm">${initials}</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800">${p.name}</h4>
+                                <p class="text-xs text-slate-400 font-medium">${condText}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] font-bold text-${sevColor}-600 bg-${sevColor}-50 px-2.5 py-1 rounded-full">${severity.toUpperCase()}</span>
+                            <button onclick="event.stopPropagation(); getPatientAISummary('${p.id}')" class="text-[10px] font-bold text-cyan-600 bg-cyan-50 px-2.5 py-1 rounded-full hover:bg-cyan-100 transition"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AI</button>
+                            <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-teal-500 transition text-sm"></i>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        // ===== AI SUMMARY FOR PATIENT =====
+        window.getPatientAISummary = async function (patientId) {
+            const patient = allPatients.find(p => p.id === patientId);
+            if (!patient) return;
+
+            const conditions = [...(patient.diseases || [])];
+            if (patient.diabetes && patient.diabetes.hasDiabetes) conditions.push('Diabetes ' + (patient.diabetes.type || ''));
+            if (patient.disability && patient.disability.length > 0) conditions.push('Disabilities: ' + patient.disability.join(', '));
+
+            const prompt = `Provide a brief clinical triage summary for patient: ${patient.name}, Age: ${patient.age || 'Unknown'}, Gender: ${patient.gender || 'Unknown'}, Conditions: ${conditions.length > 0 ? conditions.join(', ') : 'None'}, Allergies: ${patient.allergies || 'None'}. Rate severity as Critical/Moderate/Stable and give 2-3 key recommendations. Keep it under 100 words.`;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: prompt, role: 'Doctor' })
+                });
+                const data = await res.json();
+                alert('AI Summary - ' + patient.name + ':\n\n' + (data.reply || 'Unable to generate summary.'));
+            } catch (e) {
+                alert('Failed to connect to AI service.');
+            }
+        }
+
+        // ===== NOTIFICATION BELL =====
+        window.toggleDocNotifications = function () {
+            const dd = document.getElementById('doc-notif-dropdown');
+            dd.classList.toggle('hidden');
+        }
+        window.clearDocNotifications = function () {
+            document.getElementById('doc-notif-list').innerHTML = '<div class="text-center py-8 text-slate-400"><p class="text-sm font-medium">No alerts</p></div>';
+            document.getElementById('doc-notif-badge').classList.add('hidden');
+        }
+        // Close on outside click
+        document.addEventListener('click', function (e) {
+            const wrapper = document.getElementById('doc-notif-wrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                document.getElementById('doc-notif-dropdown').classList.add('hidden');
+            }
+        });
+
+        function populateNotifications() {
+            if (allPatients.length === 0) return;
+            const critical = allPatients.filter(p => getPatientCriticalityScore(p) >= 5);
+            if (critical.length === 0) return;
+
+            const badge = document.getElementById('doc-notif-badge');
+            badge.textContent = critical.length;
+            badge.classList.remove('hidden');
+
+            const list = document.getElementById('doc-notif-list');
+            list.innerHTML = critical.map(p => {
+                const conditions = [...(p.diseases || [])];
+                if (p.diabetes && p.diabetes.hasDiabetes) conditions.push('Diabetes');
+                return `
+                    <div onclick="openPatientProfile('${p.id}'); toggleDocNotifications();" class="flex gap-3 px-5 py-4 border-b border-slate-50 cursor-pointer hover:bg-rose-50 transition">
+                        <div class="w-9 h-9 bg-rose-100 rounded-full flex items-center justify-center text-rose-500 flex-shrink-0"><i class="fa-solid fa-triangle-exclamation text-sm"></i></div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-slate-800">${p.name}</p>
+                            <p class="text-xs text-slate-500 truncate">${conditions.join(', ') || 'Multiple risk factors'}</p>
+                        </div>
+                        <span class="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full h-fit flex-shrink-0">ALERT</span>
+                    </div>`;
+            }).join('');
+        }
+
+        // ===== DOCTOR PROFILE FUNCTIONS =====
+        function getDocPhotoUrl(gender) {
+            return 'doctor-profile.jpg';
+        }
+
+        window.updateDocProfilePhoto = function () {
+            const gender = document.getElementById('doc-profile-gender').value;
+            const url = getDocPhotoUrl(gender);
+            document.getElementById('profile-page-photo').src = url;
+        }
+
+        function populateDoctorProfileCard(userData) {
+            const name = userData.name;
+            const photo = getDocPhotoUrl(userData.gender);
+
+            // Dashboard card
+            const cardName = document.getElementById('doc-card-name');
+            const cardSpec = document.getElementById('doc-card-specialty');
+            const cardFees = document.getElementById('doc-card-fees');
+            const cardExp = document.getElementById('doc-card-exp');
+            const cardHosp = document.getElementById('doc-card-hospital');
+            const cardPhoto = document.getElementById('doc-profile-photo');
+
+            if (cardName) cardName.textContent = name;
+            if (cardSpec) cardSpec.textContent = (userData.specialty || 'General Physician').toUpperCase();
+            if (cardFees) cardFees.textContent = userData.fees ? '₹ ' + userData.fees : '—';
+            if (cardExp) cardExp.textContent = userData.experience || '—';
+            if (cardHosp) cardHosp.textContent = userData.hospital || '—';
+            if (cardPhoto) cardPhoto.src = photo;
+
+            // Header area
+            const headerImg = document.querySelector('header img[alt="Dr Profile"]');
+            if (headerImg) headerImg.src = photo;
+            const headerName = document.getElementById('doctor-name');
+            if (headerName) headerName.textContent = name;
+            const specEl = document.getElementById('doctor-specialty');
+            if (specEl) specEl.textContent = (userData.specialty || 'General Physician').toUpperCase();
+
+            // Profile form
+            const formFields = {
+                'doc-profile-name': name,
+                'doc-profile-email': userData.email,
+                'doc-profile-phone': userData.phone || '',
+                'doc-profile-specialty': userData.specialty || '',
+                'doc-profile-exp': userData.experience || '',
+                'doc-profile-hospital': userData.hospital || '',
+                'doc-profile-fees': userData.fees || '',
+                'doc-profile-about': userData.about || ''
+            };
+            Object.entries(formFields).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            });
+            const genderSel = document.getElementById('doc-profile-gender');
+            if (genderSel && userData.gender) genderSel.value = userData.gender;
+            const profilePagePhoto = document.getElementById('profile-page-photo');
+            if (profilePagePhoto) profilePagePhoto.src = photo;
+            const profilePageName = document.getElementById('profile-page-name');
+            if (profilePageName) profilePageName.textContent = name;
+        }
+
+        window.saveDoctorProfile = async function () {
+            const token = localStorage.getItem('medisync_token');
+            if (!token) return;
+
+            const body = {
+                name: document.getElementById('doc-profile-name').value.trim(),
+                phone: document.getElementById('doc-profile-phone').value.trim(),
+                gender: document.getElementById('doc-profile-gender').value,
+                specialty: document.getElementById('doc-profile-specialty').value.trim(),
+                experience: document.getElementById('doc-profile-exp').value.trim(),
+                hospital: document.getElementById('doc-profile-hospital').value.trim(),
+                fees: document.getElementById('doc-profile-fees').value.trim(),
+                about: document.getElementById('doc-profile-about').value.trim()
+            };
+
+            try {
+                const res = await fetch('/api/users/me', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(body)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    populateDoctorProfileCard({ ...data, doctorVerification: window._docVerification });
+                    // Also update header elements
+                    const headerName = document.getElementById('doctor-name');
+                    if (headerName) headerName.textContent = data.name || body.name;
+                    const headerSpec = document.getElementById('doctor-specialty');
+                    if (headerSpec) headerSpec.textContent = (data.specialty || body.specialty || 'General Physician').toUpperCase();
+                    alert('Profile saved successfully!');
+                } else {
+                    alert('Failed to save profile.');
+                }
+            } catch (e) {
+                alert('Network error. Please try again.');
+            }
+        }
+    </script>
+
+    <!-- MEDISYNC AI CHATBOT (DOCTOR) -->
+    <div id="ai-chatbot-widget" class="fixed bottom-6 right-8 z-50 flex flex-col items-end">
+        <div id="ai-chat-window"
+            class="hidden w-80 bg-white rounded-3xl shadow-2xl border border-slate-100 flex flex-col overflow-hidden mb-4 transition-all origin-bottom-right transform scale-95 opacity-0">
+            <div class="bg-gradient-to-r from-teal-500 to-indigo-500 p-4 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-teal-500 text-lg shadow-sm">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-sm">Medisync AI Pro</h4>
+                        <p class="text-[10px] font-medium opacity-90">Online â€¢ Doctor Core</p>
+                    </div>
+                </div>
+                <button onclick="toggleChatbot()" class="text-white hover:text-rose-100 transition"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div id="chat-messages" class="h-[300px] p-4 overflow-y-auto bg-slate-50 flex flex-col gap-3 scroll-smooth">
+                <div class="flex items-end gap-2">
+                    <div
+                        class="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs flex-shrink-0">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <div
+                        class="bg-white border border-slate-100 p-3 rounded-2xl rounded-bl-sm shadow-sm text-sm text-slate-600 max-w-[80%]">
+                        Hello Doctor! Need a summary on a patient file or recent interaction?
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-white border-t border-slate-100 flex items-center gap-2">
+                <input type="text" id="chat-input" placeholder="Type query..."
+                    class="flex-1 bg-slate-50 border border-slate-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    onkeypress="handleChatPress(event)">
+                <button onclick="sendChatMessage()"
+                    class="w-10 h-10 bg-teal-500 text-white rounded-full flex items-center justify-center shadow-md hover:bg-teal-600 transition flex-shrink-0">
+                    <i class="fa-solid fa-paper-plane text-sm relative right-[1px]"></i>
+                </button>
+            </div>
+        </div>
+
+        <button onclick="toggleChatbot()"
+            class="w-14 h-14 bg-gradient-to-r from-teal-500 to-indigo-500 text-white rounded-full shadow-lg shadow-teal-200 flex items-center justify-center text-2xl hover:scale-110 transition-transform">
+            <i class="fa-solid fa-brain"></i>
+        </button>
+    </div>
+
+    <script>
+        function toggleChatbot() {
+            const chatWindow = document.getElementById('ai-chat-window');
+            if (chatWindow.classList.contains('hidden')) {
+                chatWindow.classList.remove('hidden');
+                setTimeout(() => {
+                    chatWindow.classList.remove('scale-95', 'opacity-0');
+                    chatWindow.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                chatWindow.classList.remove('scale-100', 'opacity-100');
+                chatWindow.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => { chatWindow.classList.add('hidden'); }, 300);
+            }
+        }
+        function handleChatPress(e) { if (e.key === 'Enter') sendChatMessage(); }
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const chat = document.getElementById('chat-messages');
+            chat.innerHTML += `
+                <div class="flex items-end gap-2 justify-end mt-2">
+                    <div class="bg-indigo-500 text-white p-3 rounded-2xl rounded-br-sm shadow-sm text-sm max-w-[80%]">${msg}</div>
+                </div>
+            `;
+            input.value = '';
+            chat.scrollTop = chat.scrollHeight;
+
+            const typingId = 'typing-' + Date.now();
+            chat.innerHTML += `
+                <div id="${typingId}" class="flex items-end gap-2 mt-2">
+                    <div class="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs flex-shrink-0"><i class="fa-solid fa-brain"></i></div>
+                    <div class="bg-white border border-slate-100 p-3 rounded-2xl rounded-bl-sm shadow-sm text-sm text-slate-500 italic">Thinking...</div>
+                </div>
+            `;
+            chat.scrollTop = chat.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, role: 'Doctor' })
+                });
+                const data = await response.json();
+                document.getElementById(typingId).remove();
+
+                chat.innerHTML += `
+                    <div class="flex items-end gap-2 mt-2">
+                        <div class="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs flex-shrink-0"><i class="fa-solid fa-brain"></i></div>
+                        <div class="bg-white border border-slate-100 p-3 rounded-2xl rounded-bl-sm shadow-sm text-sm text-slate-600 max-w-[80%] whitespace-pre-wrap">${data.reply || "Error."}</div>
+                    </div>
+                `;
+            } catch (e) {
+                document.getElementById(typingId).remove();
+                chat.innerHTML += `<div class="text-xs text-rose-500 text-center my-2">Connection failed.</div>`;
+            }
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>

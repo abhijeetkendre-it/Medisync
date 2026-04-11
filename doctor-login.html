@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Login | Medisync</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #0284c7, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 flex items-center justify-center min-h-screen px-6">
+
+    <div class="max-w-6xl w-full grid md:grid-cols-2 bg-white rounded-3xl shadow-xl overflow-hidden">
+
+        <!-- LEFT SIDE -->
+        <div class="hidden md:flex flex-col justify-center p-12 bg-gradient-to-br from-sky-100 to-emerald-100">
+            <h1 class="text-4xl font-bold mb-4">
+                Welcome Back, <span class="gradient-text">Medisync</span>
+            </h1>
+            <p class="text-slate-600 text-lg">
+                Smart Remote Patient Monitoring System connecting patients and doctors anytime, anywhere.
+            </p>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="p-8 md:p-12">
+
+            <!-- LOGO -->
+            <div class="flex items-center gap-2 mb-8">
+                <img src="medisync-logo.png" class="w-10 h-10">
+                <span class="text-2xl font-bold gradient-text">Medisync</span>
+            </div>
+
+            <h2 class="text-2xl font-bold mb-6">Doctor Log In</h2>
+
+            <!-- FORM -->
+            <form id="loginForm" class="space-y-5" onsubmit="handleLogin(event)">
+
+                <!-- EMAIL -->
+                <div>
+                    <label class="text-sm text-slate-600">Email address</label>
+                    <input type="email" id="email" placeholder="name@example.com" required
+                        class="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-400">
+                </div>
+
+                <!-- PASSWORD -->
+                <div>
+                    <label class="text-sm text-slate-600">Password</label>
+
+                    <div class="relative mt-1">
+                        <input id="password" type="password" placeholder="Enter your password"
+                            class="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-400">
+
+                        <!-- ICON FIXED -->
+                        <button type="button" onclick="togglePassword()"
+                            class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500 hover:text-sky-600 transition">
+                            <i id="eyeIcon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REMEMBER + FORGOT -->
+                <div class="flex justify-between text-sm">
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox"> Remember for 30 days
+                    </label>
+                    <a href="#" class="text-sky-600 hover:underline">Forgot password?</a>
+                </div>
+
+                <!-- LOGIN BUTTON -->
+                <button type="submit"
+                    class="w-full bg-emerald-500 text-white py-3 rounded-xl font-bold hover:bg-emerald-600 transition shadow-lg">
+                    Sign In
+                </button>
+
+                <!-- DIVIDER -->
+                <div class="text-center text-sm text-slate-400">or continue with</div>
+
+                <!-- SOCIAL LOGIN -->
+                <div class="flex gap-4">
+                    <button type="button"
+                        class="w-full border border-slate-200 py-2 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-50">
+                        <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" class="w-5">
+                        Google
+                    </button>
+
+                    <button type="button"
+                        class="w-full border border-slate-200 py-2 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-50">
+                        <i class="fa-brands fa-apple text-lg"></i>
+                        Apple
+                    </button>
+                </div>
+
+            </form>
+
+            <!-- SIGNUP -->
+            <div id="otpSection" class="hidden mt-6">
+                <h3 class="text-xl font-bold mb-4">Verify Your Login</h3>
+                <p class="text-sm text-slate-600 mb-6">We've sent a 6-digit OTP to your email address.</p>
+                <form class="space-y-5" onsubmit="handleVerifyLogin(event)">
+                    <div>
+                        <label class="text-sm text-slate-600">Enter OTP <span class="text-red-500">*</span></label>
+                        <input type="text" id="otpInput" required placeholder="123456" maxlength="6"
+                            class="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-400 tracking-widest text-center text-lg font-bold">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-emerald-500 text-white py-3 rounded-xl font-bold hover:bg-emerald-600 transition shadow-lg">
+                        Verify OTP & Login
+                    </button>
+                </form>
+            </div>
+
+            <p class="text-sm text-slate-500 mt-6 text-center">
+                Don’t have an account?
+                <a href="signup.html" class="text-sky-600 font-semibold hover:underline">Create account</a>
+            </p>
+
+            <!-- HELP -->
+            <p class="text-sm text-center mt-2">
+                <a href="#" class="text-sky-600 hover:underline">Need help signing in?</a>
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+
+        window.handleLogin = async function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.requireOtp) {
+                        document.getElementById("loginForm").classList.add("hidden");
+                        document.getElementById("otpSection").classList.remove("hidden");
+                        window.loginEmail = email;
+                    } else {
+                        localStorage.setItem('medisync_token', data.token);
+
+                        if (data.role === "Doctor") {
+                            window.location.href = "doctor-dashboard.html";
+                        } else {
+                            alert("Access denied. You are registered as a patient.");
+                            window.location.href = "login.html";
+                        }
+                    }
+                } else {
+                    alert(data.message || "Invalid credentials. Please try again.");
+                }
+
+            } catch (error) {
+                console.error("Login error:", error);
+                alert("Server error. Please try again.");
+            }
+        }
+
+        window.handleVerifyLogin = async function (e) {
+            e.preventDefault();
+            const otp = document.getElementById('otpInput').value.trim();
+
+            try {
+                const response = await fetch('/api/auth/verify-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: window.loginEmail, otp })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('medisync_token', data.token);
+
+                    if (data.role === "Doctor") {
+                        window.location.href = "doctor-dashboard.html";
+                    } else {
+                        alert("Access denied. You are registered as a patient.");
+                        window.location.href = "login.html";
+                    }
+                } else {
+                    alert(data.message || "Invalid OTP");
+                }
+            } catch (error) {
+                console.error("Verify Login error:", error);
+                alert("Server Error: " + error.message);
+            }
+        }
+    </script>
+    <script>
+        window.togglePassword = function () {
+            const pass = document.getElementById("password");
+            const icon = document.getElementById("eyeIcon");
+
+            if (pass.type === "password") {
+                pass.type = "text";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                pass.type = "password";
+                icon.classList.replace("fa-eye-slash", "fa-eye");
+            }
+        }
+    </script>
+
+</body>
+
+</html>
