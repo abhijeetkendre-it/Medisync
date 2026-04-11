@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Medisync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .gradient-text { background: linear-gradient(135deg, #6366f1, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .float-anim { animation: float 4s ease-in-out infinite; }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
+        .pulse-icon { animation: pulse-ring 2s infinite; }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 flex items-center justify-center px-6 relative overflow-hidden">
+
+    <!-- Background decorations -->
+    <div class="absolute top-20 left-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-20 right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-500/5 rounded-full blur-3xl"></div>
+
+    <div class="relative z-10 w-full max-w-md">
+        <!-- Logo -->
+        <div class="flex items-center justify-center gap-3 mb-8">
+            <img src="medisync-logo.png" class="w-10 h-10 object-contain">
+            <h1 class="text-2xl font-extrabold gradient-text">Medisync Admin</h1>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-500"></div>
+
+            <!-- Icon -->
+            <div class="flex justify-center mb-6">
+                <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 pulse-icon float-anim">
+                    <i class="fa-solid fa-shield-halved text-3xl text-white"></i>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-extrabold text-white text-center mb-1">Admin Access</h2>
+            <p class="text-sm text-slate-400 text-center mb-8">Restricted area. Authorized personnel only.</p>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-5">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Username</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                        <input type="text" id="admin-username" required placeholder="Enter admin username"
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                        <input type="password" id="admin-password" required placeholder="Enter password"
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                        <i onclick="togglePass()" id="eye-icon" class="fa-solid fa-eye absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 cursor-pointer hover:text-slate-300 transition"></i>
+                    </div>
+                </div>
+
+                <div id="login-error" class="hidden text-sm text-rose-400 font-semibold text-center bg-rose-500/10 rounded-xl py-2"></div>
+
+                <button type="submit" id="login-btn"
+                    class="w-full bg-gradient-to-r from-indigo-500 to-violet-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Dashboard
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-white/5 text-center">
+                <a href="index.html" class="text-sm text-slate-400 hover:text-indigo-400 transition font-medium">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back to Medisync Home
+                </a>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-slate-600 mt-6">&copy; 2026 Medisync. All rights reserved.</p>
+    </div>
+
+    <script>
+        function togglePass() {
+            const input = document.getElementById('admin-password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
+            else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('admin-username').value.trim();
+            const password = document.getElementById('admin-password').value;
+            const errorEl = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+
+            errorEl.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Authenticating...';
+
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    localStorage.setItem('medisync_admin_token', data.token);
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    errorEl.textContent = data.message || 'Invalid credentials';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorEl.textContent = 'Server error. Please try again.';
+                errorEl.classList.remove('hidden');
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Dashboard';
+        }
+    </script>
+</body>
+</html>

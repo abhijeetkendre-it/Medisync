@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Medisync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: #e2e8f0; }
+        .gradient-text { background: linear-gradient(135deg, #6366f1, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        .glass-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(148, 163, 184, 0.1); }
+        .status-verified { background: #064e3b; color: #34d399; }
+        .status-pending { background: #78350f; color: #fbbf24; }
+        .status-rejected { background: #7f1d1d; color: #f87171; }
+        .role-doctor { background: #1e1b4b; color: #a5b4fc; }
+        .role-patient { background: #042f2e; color: #5eead4; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-row { animation: fadeIn 0.3s ease forwards; }
+        .tab-active { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.5); }
+        .tab-inactive { background: rgba(30, 41, 59, 0.5); color: #94a3b8; }
+        .tab-inactive:hover { background: rgba(51, 65, 85, 0.5); color: #e2e8f0; }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-50 border-b border-slate-800 bg-slate-900/90 backdrop-blur-xl">
+        <div class="max-w-[1600px] mx-auto flex items-center justify-between px-8 py-4">
+            <div class="flex items-center gap-3">
+                <img src="medisync-logo.png" class="w-8 h-8 object-contain">
+                <h1 class="text-xl font-extrabold gradient-text">Medisync</h1>
+                <span class="bg-indigo-500/20 text-indigo-400 text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider">ADMIN</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-slate-400 font-medium"><i class="fa-solid fa-shield-halved text-indigo-400 mr-1"></i> Superadmin</span>
+                <button onclick="adminLogout()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto px-8 py-8">
+
+        <!-- STATS CARDS -->
+        <div id="stats-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center"><i class="fa-solid fa-users text-xl text-indigo-400"></i></div>
+                    <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full"><i class="fa-solid fa-arrow-trend-up mr-1"></i>TOTAL</span>
+                </div>
+                <h3 id="stat-total" class="text-3xl font-extrabold text-white mb-1">—</h3>
+                <p class="text-sm text-slate-400 font-medium">Total Users</p>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 bg-teal-500/20 rounded-xl flex items-center justify-center"><i class="fa-solid fa-hospital-user text-xl text-teal-400"></i></div>
+                    <span class="text-xs font-bold text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded-full">PATIENTS</span>
+                </div>
+                <h3 id="stat-patients" class="text-3xl font-extrabold text-white mb-1">—</h3>
+                <p class="text-sm text-slate-400 font-medium">Registered Patients</p>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center"><i class="fa-solid fa-user-doctor text-xl text-violet-400"></i></div>
+                    <span class="text-xs font-bold text-violet-400 bg-violet-500/10 px-2.5 py-1 rounded-full">DOCTORS</span>
+                </div>
+                <h3 id="stat-doctors" class="text-3xl font-extrabold text-white mb-1">—</h3>
+                <p class="text-sm text-slate-400 font-medium">Total Doctors</p>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center"><i class="fa-solid fa-circle-check text-xl text-emerald-400"></i></div>
+                    <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">VERIFIED</span>
+                </div>
+                <h3 id="stat-verified" class="text-3xl font-extrabold text-white mb-1">—</h3>
+                <p class="text-sm text-slate-400 font-medium">Verified Doctors</p>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="flex gap-3 mb-6">
+            <button onclick="switchAdminTab('users')" id="tab-users" class="tab-active px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                <i class="fa-solid fa-users"></i> All Users
+            </button>
+            <button onclick="switchAdminTab('appointments')" id="tab-appointments" class="tab-inactive px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+                <i class="fa-solid fa-calendar-check"></i> Appointments
+            </button>
+        </div>
+
+        <!-- USERS TABLE SECTION -->
+        <div id="section-users" class="glass-card rounded-2xl overflow-hidden">
+            <!-- SEARCH & FILTER BAR -->
+            <div class="flex flex-wrap gap-4 items-center px-6 py-5 border-b border-slate-700/50">
+                <div class="relative flex-1 min-w-[250px]">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <input type="text" id="search-input" oninput="renderUsers()" placeholder="Search by name, email, phone..."
+                        class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 pl-11 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <select id="role-filter" onchange="renderUsers()" class="bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                    <option value="">All Roles</option>
+                    <option value="Patient">Patients</option>
+                    <option value="Doctor">Doctors</option>
+                </select>
+                <select id="status-filter" onchange="renderUsers()" class="bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                    <option value="">All Status</option>
+                    <option value="verified">Verified</option>
+                    <option value="pending">Pending</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <button onclick="refreshData()" class="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 px-4 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+
+            <!-- TABLE -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-slate-700/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                            <th class="px-6 py-4">#</th>
+                            <th class="px-6 py-4">Name</th>
+                            <th class="px-6 py-4">Email</th>
+                            <th class="px-6 py-4">Phone</th>
+                            <th class="px-6 py-4">Role</th>
+                            <th class="px-6 py-4">Gender</th>
+                            <th class="px-6 py-4">Specialty</th>
+                            <th class="px-6 py-4">Experience</th>
+                            <th class="px-6 py-4">Hospital</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Joined</th>
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody"></tbody>
+                </table>
+            </div>
+
+            <div id="no-results" class="hidden text-center py-12 text-slate-500">
+                <i class="fa-solid fa-search text-3xl mb-3 block text-slate-600"></i>
+                <p class="font-bold">No users found matching your filters</p>
+            </div>
+        </div>
+
+        <!-- APPOINTMENTS SECTION -->
+        <div id="section-appointments" class="glass-card rounded-2xl overflow-hidden hidden">
+            <div class="px-6 py-5 border-b border-slate-700/50 flex justify-between items-center">
+                <h3 class="text-lg font-extrabold text-white flex items-center gap-2"><i class="fa-solid fa-calendar-check text-indigo-400"></i> All Appointments</h3>
+                <button onclick="refreshData()" class="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 px-4 py-2 rounded-xl text-sm font-bold transition"><i class="fa-solid fa-rotate mr-1"></i> Refresh</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-slate-700/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                            <th class="px-6 py-4">#</th>
+                            <th class="px-6 py-4">Patient</th>
+                            <th class="px-6 py-4">Email</th>
+                            <th class="px-6 py-4">Doctor</th>
+                            <th class="px-6 py-4">Specialty</th>
+                            <th class="px-6 py-4">Problem</th>
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">Time</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Booked On</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointments-tbody"></tbody>
+                </table>
+            </div>
+            <div id="no-appointments" class="hidden text-center py-12 text-slate-500">
+                <i class="fa-solid fa-calendar-xmark text-3xl mb-3 block text-slate-600"></i>
+                <p class="font-bold">No appointments booked yet</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- USER DETAIL MODAL -->
+    <div id="user-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center">
+        <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-lg w-[90%] max-h-[85vh] overflow-y-auto p-8 relative" style="animation: fadeIn 0.3s ease;">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let allUsers = [];
+        let allAppointments = [];
+        const token = localStorage.getItem('medisync_admin_token');
+
+        if (!token) window.location.href = 'admin-login.html';
+
+        async function fetchUsers() {
+            try {
+                const res = await fetch('/api/admin/users', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.status === 401 || res.status === 403) { adminLogout(); return; }
+                allUsers = await res.json();
+                updateStats();
+                renderUsers();
+            } catch (e) {
+                console.error('Failed to fetch users:', e);
+            }
+        }
+
+        async function fetchAppointments() {
+            try {
+                const res = await fetch('/api/admin/appointments', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    allAppointments = await res.json();
+                    renderAppointments();
+                }
+            } catch (e) { console.error('Failed to fetch appointments:', e); }
+        }
+
+        function refreshData() { fetchUsers(); fetchAppointments(); }
+
+        function updateStats() {
+            document.getElementById('stat-total').textContent = allUsers.length;
+            document.getElementById('stat-patients').textContent = allUsers.filter(u => u.role === 'Patient').length;
+            document.getElementById('stat-doctors').textContent = allUsers.filter(u => u.role === 'Doctor').length;
+            document.getElementById('stat-verified').textContent = allUsers.filter(u => u.doctorVerification && u.doctorVerification.status === 'verified').length;
+        }
+
+        function renderUsers() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const roleFilter = document.getElementById('role-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            let filtered = allUsers.filter(u => {
+                const matchSearch = u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search) || (u.phone || '').includes(search);
+                const matchRole = !roleFilter || u.role === roleFilter;
+                const matchStatus = !statusFilter || (u.doctorVerification && u.doctorVerification.status === statusFilter);
+                return matchSearch && matchRole && matchStatus;
+            });
+
+            const tbody = document.getElementById('users-tbody');
+            const noResults = document.getElementById('no-results');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+            noResults.classList.add('hidden');
+
+            tbody.innerHTML = filtered.map((u, i) => {
+                const verStatus = u.doctorVerification ? u.doctorVerification.status : (u.role === 'Patient' ? 'N/A' : 'none');
+                const statusClass = verStatus === 'verified' ? 'status-verified' : verStatus === 'pending' ? 'status-pending' : verStatus === 'rejected' ? 'status-rejected' : 'bg-slate-700/50 text-slate-400';
+                const roleClass = u.role === 'Doctor' ? 'role-doctor' : 'role-patient';
+                const joined = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+
+                return `<tr class="border-b border-slate-800/50 hover:bg-slate-800/40 transition animate-row" style="animation-delay: ${i * 30}ms">
+                    <td class="px-6 py-4 text-xs text-slate-500 font-bold">${i + 1}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 bg-gradient-to-br ${u.role === 'Doctor' ? 'from-violet-500 to-indigo-600' : 'from-teal-500 to-emerald-600'} rounded-xl flex items-center justify-center text-white text-xs font-bold shadow">
+                                ${u.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <p class="font-bold text-white text-sm">${u.name}</p>
+                                ${u.doctorVerification ? '<p class="text-[10px] text-slate-500">' + (u.doctorVerification.doctorName || '') + '</p>' : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${u.email}</td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${u.phone || '—'}</td>
+                    <td class="px-6 py-4"><span class="${roleClass} text-xs font-bold px-2.5 py-1 rounded-lg">${u.role}</span></td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${u.gender || '—'}</td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${u.specialty || '—'}</td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${u.experience || '—'}</td>
+                    <td class="px-6 py-4 text-sm text-slate-400 max-w-[140px] truncate">${u.hospital || '—'}</td>
+                    <td class="px-6 py-4"><span class="${statusClass} text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">${verStatus}</span></td>
+                    <td class="px-6 py-4 text-xs text-slate-500">${joined}</td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center gap-2 justify-end">
+                            <button onclick='viewUser(${JSON.stringify(u).replace(/'/g, "&#39;")})' class="text-indigo-400 hover:text-indigo-300 transition text-sm" title="View Details"><i class="fa-solid fa-eye"></i></button>
+                            ${u.role === 'Doctor' && u.doctorVerification && u.doctorVerification.status === 'pending' ? `
+                                <button onclick="verifyDoctor('${u.id}','verified')" class="text-emerald-400 hover:text-emerald-300 transition text-sm" title="Approve"><i class="fa-solid fa-check"></i></button>
+                                <button onclick="verifyDoctor('${u.id}','rejected')" class="text-rose-400 hover:text-rose-300 transition text-sm" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderAppointments() {
+            const tbody = document.getElementById('appointments-tbody');
+            const noAppts = document.getElementById('no-appointments');
+
+            if (allAppointments.length === 0) {
+                tbody.innerHTML = '';
+                noAppts.classList.remove('hidden');
+                return;
+            }
+            noAppts.classList.add('hidden');
+
+            tbody.innerHTML = allAppointments.map((a, i) => {
+                const booked = new Date(a.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                return `<tr class="border-b border-slate-800/50 hover:bg-slate-800/40 transition animate-row">
+                    <td class="px-6 py-4 text-xs text-slate-500 font-bold">${i + 1}</td>
+                    <td class="px-6 py-4 font-bold text-white text-sm">${a.patientName}</td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${a.patientEmail}</td>
+                    <td class="px-6 py-4 text-sm text-slate-300 font-semibold">${a.doctorName}</td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${a.doctorSpecialty}</td>
+                    <td class="px-6 py-4 text-sm text-slate-400 max-w-[200px] truncate">${a.problem}</td>
+                    <td class="px-6 py-4 text-sm text-indigo-400 font-bold">${a.date}</td>
+                    <td class="px-6 py-4 text-sm text-slate-300">${a.time}</td>
+                    <td class="px-6 py-4"><span class="bg-emerald-900/50 text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full">${a.status}</span></td>
+                    <td class="px-6 py-4 text-xs text-slate-500">${booked}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function viewUser(user) {
+            const modal = document.getElementById('user-modal');
+            const content = document.getElementById('modal-content');
+            const verInfo = user.doctorVerification ? `
+                <div class="mt-4">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Verification Info</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Doctor Name</p><p class="text-sm text-white font-bold">${user.doctorVerification.doctorName || '—'}</p></div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Reg. Number</p><p class="text-sm text-white font-bold">${user.doctorVerification.registrationNumber || '—'}</p></div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Year</p><p class="text-sm text-white font-bold">${user.doctorVerification.yearOfRegistration || '—'}</p></div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Council</p><p class="text-sm text-white font-bold">${user.doctorVerification.stateMedicalCouncil || '—'}</p></div>
+                    </div>
+                </div>` : '';
+
+            const medInfo = user.role === 'Patient' ? `
+                <div class="mt-4">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Medical Profile</h4>
+                    <div class="space-y-2">
+                        <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Allergies</p><p class="text-sm text-white">${user.allergies || 'None'}</p></div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Diabetes</p><p class="text-sm text-white">${user.diabetes && user.diabetes.hasDiabetes ? user.diabetes.type + ' (Sugar: ' + user.diabetes.sugarLevel + ')' : 'No'}</p></div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Disabilities</p><p class="text-sm text-white">${(user.disability || []).length > 0 ? user.disability.join(', ') : 'None'}</p></div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Diseases</p><p class="text-sm text-white">${(user.diseases || []).length > 0 ? user.diseases.join(', ') : 'None'}</p></div>
+                    </div>
+                </div>` : '';
+
+            content.innerHTML = `
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br ${user.role === 'Doctor' ? 'from-violet-500 to-indigo-600' : 'from-teal-500 to-emerald-600'} rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                        ${user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold text-white">${user.name}</h3>
+                        <p class="text-sm text-slate-400">${user.email}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Role</p><p class="text-sm text-white font-bold">${user.role}</p></div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Phone</p><p class="text-sm text-white font-bold">${user.phone || '—'}</p></div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Gender</p><p class="text-sm text-white font-bold">${user.gender || '—'}</p></div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Age</p><p class="text-sm text-white font-bold">${user.age || '—'}</p></div>
+                    ${user.role === 'Doctor' ? `
+                    <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Specialty</p><p class="text-sm text-white font-bold">${user.specialty || '—'}</p></div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Experience</p><p class="text-sm text-white font-bold">${user.experience || '—'}</p></div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl col-span-2"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Hospital</p><p class="text-sm text-white font-bold">${user.hospital || '—'}</p></div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Fees</p><p class="text-sm text-white font-bold">${user.fees ? '₹' + user.fees : '—'}</p></div>
+                    ` : ''}
+                    <div class="bg-slate-900/50 p-3 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Joined</p><p class="text-sm text-white font-bold">${user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN') : '—'}</p></div>
+                </div>
+                ${verInfo}
+                ${medInfo}
+                ${user.about ? '<div class="mt-4 bg-slate-900/50 p-4 rounded-xl"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">About</p><p class="text-sm text-slate-300 leading-relaxed">' + user.about + '</p></div>' : ''}
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('user-modal').classList.add('hidden');
+        }
+
+        async function verifyDoctor(userId, status) {
+            if (!confirm(`Are you sure you want to ${status === 'verified' ? 'APPROVE' : 'REJECT'} this doctor?`)) return;
+            try {
+                const res = await fetch(`/api/admin/verify-doctor/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ status })
+                });
+                if (res.ok) {
+                    await fetchUsers();
+                    showToast(`Doctor ${status} successfully!`, status === 'verified' ? 'emerald' : 'rose');
+                }
+            } catch (e) { alert('Failed to update. Try again.'); }
+        }
+
+        function showToast(msg, color) {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-6 right-6 bg-${color}-500 text-white px-6 py-4 rounded-2xl shadow-2xl z-[99999] font-bold flex items-center gap-3 text-sm`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-lg"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function switchAdminTab(tab) {
+            document.getElementById('section-users').classList.toggle('hidden', tab !== 'users');
+            document.getElementById('section-appointments').classList.toggle('hidden', tab !== 'appointments');
+            document.getElementById('tab-users').className = tab === 'users' ? 'tab-active px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2' : 'tab-inactive px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2';
+            document.getElementById('tab-appointments').className = tab === 'appointments' ? 'tab-active px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2' : 'tab-inactive px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2';
+        }
+
+        function adminLogout() {
+            localStorage.removeItem('medisync_admin_token');
+            window.location.href = 'admin-login.html';
+        }
+
+        // Close modal on outside click
+        document.getElementById('user-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // Initial load
+        fetchUsers();
+        fetchAppointments();
+    </script>
+</body>
+</html>
