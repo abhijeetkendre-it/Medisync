@@ -557,7 +557,11 @@ app.post('/api/family', async (req, res) => {
                 </div>
             </div>`
         };
-        transporter.sendMail(mailOptions).catch(err => console.error("Family Mail error:", err));
+        try {
+            await transporter.sendMail(mailOptions);
+        } catch(err) {
+            console.error("Family Mail error:", err);
+        }
 
         res.status(201).json({ message: 'Family member added and invite sent', member: newMember });
     } catch (e) {
