@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 const crypto = require('crypto');
 const { GoogleGenAI } = require('@google/genai');
-const Groq = require('groq-sdk');
 const { db, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, addDoc, deleteDoc } = require('./database');
 const nodemailer = require('nodemailer');
 
@@ -632,6 +631,14 @@ INSTRUCTIONS:
 2. Provide triage analysis, symptom checking, and general hygiene tips. Be reassuring and friendly.
 3. SAFETY CONSTRAINT: Always remind the patient to consult a doctor for severe symptoms. Do not diagnose explicitly.
 4. IMPORTANT FORMATTING: Do NOT use markdown. Do not use asterisks (*) for bolding or italics. Use simple dashes (-) for lists and use double line breaks for spacing out paragraphs. Output clean plain text.`;
+        }
+
+        let Groq;
+        try {
+            Groq = require('groq-sdk');
+        } catch (e) {
+            console.error("Groq SDK is not installed. Please run npm install groq-sdk or update package.json on Vercel.");
+            return res.status(500).json({ reply: "Chat feature is temporarily unavailable due to a missing dependency. Please ensure groq-sdk is deployed." });
         }
 
         const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
