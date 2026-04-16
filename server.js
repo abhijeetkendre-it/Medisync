@@ -633,15 +633,7 @@ INSTRUCTIONS:
 4. IMPORTANT FORMATTING: Do NOT use markdown. Do not use asterisks (*) for bolding or italics. Use simple dashes (-) for lists and use double line breaks for spacing out paragraphs. Output clean plain text.`;
         }
 
-        let Groq;
-        try {
-            Groq = require('groq-sdk');
-        } catch (e) {
-            console.error("Groq SDK is not installed. Please run npm install groq-sdk or update package.json on Vercel.");
-            return res.status(500).json({ reply: "Chat feature is temporarily unavailable due to a missing dependency. Please ensure groq-sdk is deployed." });
-        }
-
-        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+        const apiKey = process.env.GROQ_API_KEY || "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";
         
         // Context Injection
         let userContext = "";
@@ -664,15 +656,29 @@ INSTRUCTIONS:
             } catch(e) { }
         }
 
-        const chatCompletion = await groq.chat.completions.create({
-            messages: [
-                { role: "system", content: systemPrompt + (userContext ? "\n" + userContext : "") },
-                { role: "user", content: message }
-            ],
-            model: "llama-3.3-70b-versatile"
+        const aiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: [
+                    { role: "system", content: systemPrompt + (userContext ? "\n" + userContext : "") },
+                    { role: "user", content: message }
+                ]
+            })
         });
 
-        res.json({ reply: chatCompletion.choices[0]?.message?.content || "No response generated." });
+        if (!aiResponse.ok) {
+            const errorText = await aiResponse.text();
+            console.error("Groq API error:", errorText);
+            return res.status(500).json({ reply: "I am currently unable to process your request." });
+        }
+
+        const data = await aiResponse.json();
+        res.json({ reply: data.choices[0]?.message?.content || "No response generated." });
     } catch (error) {
         console.error("Chat API Error:", error);
         res.status(500).json({ reply: "I am experiencing network issues connecting to the Medisync Neural Network. Please ensure your API Key is valid or try again later." });
