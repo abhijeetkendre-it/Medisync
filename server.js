@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 const crypto = require('crypto');
 const { GoogleGenAI } = require('@google/genai');
+const Groq = require('groq-sdk');
 const { db, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, addDoc, deleteDoc } = require('./database');
 const nodemailer = require('nodemailer');
 
@@ -633,7 +634,7 @@ INSTRUCTIONS:
 4. IMPORTANT FORMATTING: Do NOT use markdown. Do not use asterisks (*) for bolding or italics. Use simple dashes (-) for lists and use double line breaks for spacing out paragraphs. Output clean plain text.`;
         }
 
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
         
         // Context Injection
         let userContext = "";
@@ -656,14 +657,15 @@ INSTRUCTIONS:
             } catch(e) { }
         }
 
-        const finalPrompt = `System Directive: ${systemPrompt}\n${userContext}\nUser Message: ${message}`;
-
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: finalPrompt
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: systemPrompt + (userContext ? "\n" + userContext : "") },
+                { role: "user", content: message }
+            ],
+            model: "llama-3.3-70b-versatile"
         });
 
-        res.json({ reply: response.text });
+        res.json({ reply: chatCompletion.choices[0]?.message?.content || "No response generated." });
     } catch (error) {
         console.error("Chat API Error:", error);
         res.status(500).json({ reply: "I am experiencing network issues connecting to the Medisync Neural Network. Please ensure your API Key is valid or try again later." });
