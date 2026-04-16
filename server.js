@@ -634,7 +634,7 @@ INSTRUCTIONS:
         }
 
         let envKey = process.env.GROQ_API_KEY;
-        const apiKey = (envKey && envKey !== 'your_groq_api_key_here') ? envKey : "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";
+        const apiKey = envKey;
         
         // Context Injection
         let userContext = "";
