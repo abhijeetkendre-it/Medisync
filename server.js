@@ -633,7 +633,8 @@ INSTRUCTIONS:
 4. IMPORTANT FORMATTING: Do NOT use markdown. Do not use asterisks (*) for bolding or italics. Use simple dashes (-) for lists and use double line breaks for spacing out paragraphs. Output clean plain text.`;
         }
 
-        const apiKey = process.env.GROQ_API_KEY || "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";
+        let envKey = process.env.GROQ_API_KEY;
+        const apiKey = (envKey && envKey !== 'your_groq_api_key_here') ? envKey : "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";
         
         // Context Injection
         let userContext = "";
